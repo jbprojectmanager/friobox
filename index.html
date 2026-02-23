@@ -23,20 +23,32 @@
 
         // Sistema de navegación dinámica
         function navigate(viewId) {
-            const sections = ['main-content', 'detail-view'];
-            const detailContainer = document.getElementById('detail-content');
+            const mainContent = document.getElementById('main-content');
+            const detailView = document.getElementById('detail-view');
             
             if (viewId === 'home') {
-                document.getElementById('main-content').classList.remove('hidden');
-                document.getElementById('detail-view').classList.add('hidden');
-                window.scrollTo(0, 0);
+                mainContent.classList.remove('hidden');
+                detailView.classList.add('hidden');
+                // Si hay un hash (ej: #servicios), esperamos un poco para que el elemento exista y scrolleamos
+                const hash = window.location.hash;
+                if (hash) {
+                    setTimeout(() => {
+                        const el = document.querySelector(hash);
+                        if (el) el.scrollIntoView();
+                    }, 50);
+                } else {
+                    window.scrollTo(0, 0);
+                }
             } else {
-                document.getElementById('main-content').classList.add('hidden');
-                document.getElementById('detail-view').classList.remove('hidden');
+                mainContent.classList.add('hidden');
+                detailView.classList.remove('hidden');
                 renderDetail(viewId);
                 window.scrollTo(0, 0);
             }
-            if (!document.getElementById('mobile-menu').classList.contains('hidden')) toggleMenu();
+            
+            // Cerrar menú móvil si está abierto
+            const mobileMenu = document.getElementById('mobile-menu');
+            if (!mobileMenu.classList.contains('hidden')) toggleMenu();
         }
 
         function toggleMenu() {
@@ -81,10 +93,18 @@
             'proyectos-bim': {
                 title: 'Proyectos en Metodología BIM',
                 subtitle: 'Ingeniería y Modelado 3D',
-                img: 'img/hero.png',
+                img: 'img/bim.png',
                 fallback: 'https://images.unsplash.com/photo-1503387762-592dec5832f2?q=80&w=1000',
                 desc: 'Utilizamos tecnología Building Information Modeling (BIM) para previsualizar interferencias, calcular cargas exactas y optimizar los recursos de su proyecto antes de la construcción.',
                 specs: ['Modelado 3D detallado', 'Cómputos métricos precisos', 'Simulación de flujos térmicos', 'Planos de ingeniería as-built']
+            },
+            'instalacion': {
+                title: 'Instalación Profesional',
+                subtitle: 'Montaje de Paneles Modulares para Cavas y Equipos Frigoríficos',
+                img: 'img/instalacion.png',
+                fallback: 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?q=80&w=1000',
+                desc: 'Contamos con cuadrillas especializadas para el montaje de unidades condensadoras, evaporadores, racks de compresión y tendido de tuberías de refrigeración siguiendo estándares internacionales.',
+                specs: ['Instalación de tuberías de cobre y acero', 'Aislamiento de líneas de succión', 'Carga de refrigerantes ecológicos', 'Pruebas de estanqueidad y vacío profundo']
             },
             'obra-civil': {
                 title: 'Obra Civil Especializada',
@@ -93,8 +113,31 @@
                 fallback: 'https://images.unsplash.com/photo-1590059392653-38016467000e?q=80&w=1000',
                 desc: 'La base de una buena cava es su piso. Construimos losas con barrera de vapor, aislamiento térmico y refuerzos estructurales para soportar el peso de estibas y montacargas.',
                 specs: ['Losas con poliestireno de alta densidad', 'Acabados en cuarzo o epóxicos', 'Brocales de media caña sanitarios', 'Sistemas de drenaje industrial']
+            },
+            'enchaquetado': {
+                title: 'Enchaquetado Térmico',
+                subtitle: 'Protección y Aislamiento de Tuberías',
+                img: 'img/enchaquetado.png',
+                fallback: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=1000',
+                desc: 'Protegemos su inversión con recubrimientos en aluminio o acero inoxidable para tuberías aisladas, evitando el deterioro del aislamiento por rayos UV o impactos mecánicos.',
+                specs: ['Acabados estéticos y duraderos', 'Protección contra corrosión externa', 'Reducción de pérdidas térmicas', 'Fácil limpieza y mantenimiento']
+            },
+            'soldadura': {
+                title: 'Soldadura Especializada',
+                subtitle: 'Sistemas de Alta Presión',
+                img: 'img/soldadura.png',
+                fallback: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=1000',
+                desc: 'Servicio de soldadura TIG y orbital para sistemas frigoríficos. Garantizamos uniones libres de fugas y porosidades bajo condiciones críticas de operación.',
+                specs: ['Soldadura certificada para refrigeración', 'Uso de nitrógeno seco para evitar hollín', 'Reparación de fugas en evaporadores', 'Estructuras de soporte en acero inoxidable']
+            },
+            'mantenimiento': {
+                title: 'Refrigeración y Mantenimiento',
+                subtitle: 'Continuidad Operativa Garantizada',
+                img: 'img/mantenimiento.png',
+                fallback: 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?q=80&w=1000',
+                desc: 'Planes de mantenimiento preventivo y correctivo para plantas industriales. Revisión de parámetros, limpieza de serpentines y diagnóstico electrónico de fallas.',
+                specs: ['Contratos de mantenimiento anual', 'Servicio técnico de emergencia 24/7', 'Repuestos originales', 'Informes de eficiencia energética']
             }
-            // Agregaremos más dinámicamente según sea necesario
         };
 
         function renderDetail(id) {
@@ -135,12 +178,40 @@
             `;
             document.getElementById('detail-content').innerHTML = html;
         }
+
+        // Sistema de Chat IA (Básico)
+        function enviarConsulta() {
+            const input = document.getElementById('user-msg');
+            const chatBox = document.getElementById('chat-box');
+            if (!input.value.trim()) return;
+
+            const userText = input.value;
+            chatBox.innerHTML += `
+                <div class="flex items-start gap-4 justify-end">
+                    <div class="bg-fbBlue text-white p-6 rounded-3xl rounded-tr-none shadow-md text-sm font-medium max-w-[85%]">
+                        ${userText}
+                    </div>
+                </div>
+            `;
+            input.value = "";
+            chatBox.scrollTo(0, chatBox.scrollHeight);
+
+            // Respuesta simulada mientras se integra la API
+            setTimeout(() => {
+                chatBox.innerHTML += `
+                    <div class="flex items-start gap-4">
+                        <div class="w-10 h-10 bg-fbBlue text-white rounded-xl flex items-center justify-center text-xs font-bold flex-shrink-0">FB</div>
+                        <div class="bg-white p-6 rounded-3xl rounded-tl-none shadow-md border border-slate-100 text-sm leading-relaxed max-w-[85%] text-slate-700 font-medium italic">
+                            Procesando su requerimiento técnico... Un asesor revisará sus datos para enviarle una propuesta formal.
+                        </div>
+                    </div>
+                `;
+                chatBox.scrollTo(0, chatBox.scrollHeight);
+            }, 1000);
+        }
     </script>
     <style>
-        .geometric-bg {
-            background-color: #f8fafc;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%20%23d31b22' fill-opacity='0.05'%3E%3Cpath d='M96 95h4v1h-4v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-        }
+        
         :target {
             scroll-margin-top: 120px;
         }
@@ -149,19 +220,19 @@
         }
     </style>
 </head>
-<body class="bg-fbLightGray font-sans text-slate-900">
+<body class="bg-fbLightGray font-sans text-slate-900 geometric-bg">
 
     <!-- MENÚ DE NAVEGACIÓN -->
     <nav class="bg-fbBlue shadow-xl sticky top-0 z-50 border-b-4 border-fbRed">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center py-4 lg:py-2">
                 <div class="flex-shrink-0 flex items-center cursor-pointer" onclick="navigate('home')">
-                    <div class="bg-white p-2 rounded-xl shadow-lg border-2 border-fbRed flex items-center justify-center overflow-hidden" style="width: 100px; height: 100px;">
+                    <div class="bg-white p-2 rounded-xl shadow-lg border-2 border-fbRed flex items-center justify-center overflow-hidden" style="width: 80px; height: 80px;">
                         <img src="img/logo.png" alt="Corporación Frío Box" class="max-w-full max-h-full object-contain" onerror="this.src='https://via.placeholder.com/400x400/FFFFFF/D31B22?text=FRIO+BOX'">
                     </div>
                     <div class="ml-4 hidden lg:block">
-                        <span class="block text-2xl font-black text-white leading-tight tracking-tighter">CORPORACIÓN<br>FRÍO BOX</span>
-                        <span class="text-xs tracking-[0.3em] text-fbRed font-bold uppercase italic">Soluciones Térmicas</span>
+                        <span class="block text-xl font-black text-white leading-tight tracking-tighter">CORPORACIÓN<br>FRÍO BOX</span>
+                        <span class="text-[10px] tracking-[0.3em] text-fbRed font-bold uppercase italic">Soluciones Térmicas</span>
                     </div>
                 </div>
 
@@ -192,7 +263,7 @@
         </div>
     </nav>
 
-    <!-- VISTA PRINCIPAL (EL INDEX) -->
+    <!-- VISTA PRINCIPAL -->
     <main id="main-content">
         <!-- HERO -->
         <section id="inicio" class="relative pt-16 pb-20 md:pt-32 md:pb-40 overflow-hidden px-4">
@@ -230,7 +301,6 @@
                 </div>
                 
                 <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                    <!-- Cada producto llama a navigate() -->
                     <div onclick="navigate('cavas')" class="group cursor-pointer bg-fbLightGray rounded-[3rem] p-4 hover:bg-fbBlue transition-all duration-500 shadow-sm hover:shadow-2xl">
                         <div class="aspect-square rounded-[2.5rem] overflow-hidden mb-6">
                             <img src="img/cava.png" alt="Cavas" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" onerror="this.src='https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=500'">
@@ -274,13 +344,12 @@
             </div>
         </section>
 
-        <!-- SECCIÓN SERVICIOS (AÑADIDA) -->
+        <!-- SECCIÓN SERVICIOS -->
         <section id="servicios" class="py-24 bg-fbBlue text-white">
             <div class="max-w-7xl mx-auto px-4 text-center">
                 <h2 class="text-5xl font-black uppercase italic tracking-tighter mb-16 leading-none">Servicios <br><span class="text-fbRed italic underline decoration-4 underline-offset-8 uppercase">Especializados</span></h2>
                 
                 <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <!-- Servicio 1: Proyectos BIM -->
                     <div onclick="navigate('proyectos-bim')" class="bg-white/10 p-8 rounded-[2rem] border border-white/10 hover:bg-fbRed transition-all cursor-pointer text-left group">
                         <i class="fa-solid fa-cube text-3xl mb-4 group-hover:scale-110 transition-transform block"></i>
                         <h3 class="text-2xl font-black italic uppercase mb-2">Proyectos BIM</h3>
@@ -288,15 +357,13 @@
                         <span class="text-fbRed group-hover:text-white font-black text-xs uppercase italic">Explorar <i class="fa-solid fa-chevron-right ml-1"></i></span>
                     </div>
 
-                    <!-- Servicio 2: Instalación -->
                     <div onclick="navigate('instalacion')" class="bg-white/10 p-8 rounded-[2rem] border border-white/10 hover:bg-fbRed transition-all cursor-pointer text-left group">
                         <i class="fa-solid fa-screwdriver-wrench text-3xl mb-4 group-hover:scale-110 transition-transform block"></i>
                         <h3 class="text-2xl font-black italic uppercase mb-2">Instalación</h3>
-                        <p class="text-sm text-white/70 mb-4 font-medium">Montaje profesional de unidades condensadoras y evaporadoras.</p>
+                        <p class="text-sm text-white/70 mb-4 font-medium">Montaje profesional de Paneeles Aislante de Piso, Panel Lateral y Techos.</p>
                         <span class="text-fbRed group-hover:text-white font-black text-xs uppercase italic">Explorar <i class="fa-solid fa-chevron-right ml-1"></i></span>
                     </div>
 
-                    <!-- Servicio 3: Obra Civil -->
                     <div onclick="navigate('obra-civil')" class="bg-white/10 p-8 rounded-[2rem] border border-white/10 hover:bg-fbRed transition-all cursor-pointer text-left group">
                         <i class="fa-solid fa-trowel-bricks text-3xl mb-4 group-hover:scale-110 transition-transform block"></i>
                         <h3 class="text-2xl font-black italic uppercase mb-2">Obra Civil</h3>
@@ -304,15 +371,13 @@
                         <span class="text-fbRed group-hover:text-white font-black text-xs uppercase italic">Explorar <i class="fa-solid fa-chevron-right ml-1"></i></span>
                     </div>
 
-                    <!-- Servicio 4: Enchaquetado -->
                     <div onclick="navigate('enchaquetado')" class="bg-white/10 p-8 rounded-[2rem] border border-white/10 hover:bg-fbRed transition-all cursor-pointer text-left group">
                         <i class="fa-solid fa-shield-halved text-3xl mb-4 group-hover:scale-110 transition-transform block"></i>
                         <h3 class="text-2xl font-black italic uppercase mb-2">Enchaquetado</h3>
-                        <p class="text-sm text-white/70 mb-4 font-medium">Aislamiento de tuberías con recubrimiento de aluminio o acero.</p>
+                        <p class="text-sm text-white/70 mb-4 font-medium">Aislamiento con Poliuretano de tuberías con recubrimiento de aluminio o acero.</p>
                         <span class="text-fbRed group-hover:text-white font-black text-xs uppercase italic">Explorar <i class="fa-solid fa-chevron-right ml-1"></i></span>
                     </div>
 
-                    <!-- Servicio 5: Soldadura -->
                     <div onclick="navigate('soldadura')" class="bg-white/10 p-8 rounded-[2rem] border border-white/10 hover:bg-fbRed transition-all cursor-pointer text-left group">
                         <i class="fa-solid fa-fire text-3xl mb-4 group-hover:scale-110 transition-transform block"></i>
                         <h3 class="text-2xl font-black italic uppercase mb-2">Soldadura Prof.</h3>
@@ -320,7 +385,6 @@
                         <span class="text-fbRed group-hover:text-white font-black text-xs uppercase italic">Explorar <i class="fa-solid fa-chevron-right ml-1"></i></span>
                     </div>
 
-                    <!-- Servicio 6: Refrigeración -->
                     <div onclick="navigate('mantenimiento')" class="bg-white/10 p-8 rounded-[2rem] border border-white/10 hover:bg-fbRed transition-all cursor-pointer text-left group">
                         <i class="fa-solid fa-snowflake text-3xl mb-4 group-hover:scale-110 transition-transform block"></i>
                         <h3 class="text-2xl font-black italic uppercase mb-2">Refrigeración</h3>
@@ -393,10 +457,10 @@
         </section>
     </main>
 
-    <!-- VISTA DE DETALLES (OCULTA POR DEFECTO) -->
+    <!-- VISTA DE DETALLES -->
     <div id="detail-view" class="hidden min-h-screen bg-fbLightGray pt-12 pb-24">
         <div id="detail-content">
-            <!-- El contenido se inyecta aquí con JS -->
+            <!-- El contenido se inyecta aquí -->
         </div>
     </div>
 
@@ -407,7 +471,7 @@
                 <div class="w-12 h-12 bg-white/10 rounded-lg flex items-center justify-center text-white/50 italic font-black">FB</div>
              </div>
              <p class="text-xs uppercase tracking-widest font-black text-white/50">Corporación Frío Box, C.A. - RIF: J-40813955-4</p>
-             <p class="text-[10px] mt-4 leading-relaxed">© 2024 Todos los derechos reservados. <br> Ingeniería de Vanguardia en Barquisimeto.</p>
+             <p class="text-[10px] mt-4 leading-relaxed">© 2026 Todos los derechos reservados. <br> Ingeniería de Vanguardia en Barquisimeto.</p>
         </div>
     </footer>
 
@@ -416,57 +480,5 @@
         <i class="fa-brands fa-whatsapp"></i>
     </a>
 
-    <!-- SCRIPT IA -->
-    <script>
-        const apiKey = ""; 
-
-        async function enviarConsulta() {
-            const input = document.getElementById('user-msg');
-            const box = document.getElementById('chat-box');
-            const msj = input.value.trim();
-            if(!msj) return;
-
-            mostrarMensaje('user', msj);
-            input.value = '';
-
-            const promptSistema = `Eres el Director de Ingeniería de Corporación Frío Box, C.A. en Barquisimeto.
-            Tu tono es serio, técnico, experto.
-            - Si piden dimensiones para cavas: calcula volúmenes, sugiere paneles (100mm para congelación, 60-80mm para conservación).
-            - Menciona siempre la necesidad de Obra Civil (losas aisladas) para evitar que el suelo se congele.
-            - Si preguntan por proyectos BIM: explica que modelamos todo en 3D para evitar choques con tuberías y estructuras.
-            - Cierra siempre invitándolos a escribir por WhatsApp o visitar Barquisimeto.`;
-
-            try {
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: msj }] }],
-                        systemInstruction: { parts: [{ text: promptSistema }] }
-                    })
-                });
-                const data = await response.json();
-                const respuestaIA = data.candidates?.[0]?.content?.parts?.[0]?.text || "Error al procesar el cálculo.";
-                mostrarMensaje('ai', respuestaIA);
-            } catch (e) {
-                mostrarMensaje('ai', "Error de conexión con el servidor técnico.");
-            }
-        }
-
-        function mostrarMensaje(rol, texto) {
-            const box = document.getElementById('chat-box');
-            const wrap = document.createElement('div');
-            wrap.className = `flex ${rol === 'user' ? 'justify-end' : 'justify-start'} mb-6 animate-fade-in`;
-            const bubble = document.createElement('div');
-            bubble.className = rol === 'user' 
-                ? 'bg-fbRed text-white p-6 rounded-[2rem] rounded-tr-none text-sm md:text-base font-bold max-w-[85%] shadow-xl' 
-                : 'bg-white p-6 rounded-[2rem] rounded-tl-none shadow-md border border-slate-100 text-sm md:text-base leading-relaxed max-w-[85%] text-slate-700 font-medium';
-            
-            bubble.innerHTML = texto.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
-            wrap.appendChild(bubble);
-            box.appendChild(wrap);
-            box.scrollTop = box.scrollHeight;
-        }
-    </script>
 </body>
 </html>
