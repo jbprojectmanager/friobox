@@ -2,7 +2,7 @@
 <html lang="es" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Corporación Frío Box, C.A. | Refrigeración Industrial Barquisimeto</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -21,23 +21,25 @@
             }
         }
 
-        // Sistema de navegación dinámica
+        // Navegación fluida tipo App
         function navigate(viewId) {
             const mainContent = document.getElementById('main-content');
             const detailView = document.getElementById('detail-view');
+            const bottomNav = document.getElementById('bottom-nav');
             
             if (viewId === 'home') {
                 mainContent.classList.remove('hidden');
                 detailView.classList.add('hidden');
-                // Si hay un hash (ej: #servicios), esperamos un poco para que el elemento exista y scrolleamos
+                if (bottomNav) bottomNav.classList.remove('hidden');
+                
                 const hash = window.location.hash;
                 if (hash) {
                     setTimeout(() => {
                         const el = document.querySelector(hash);
-                        if (el) el.scrollIntoView();
+                        if (el) el.scrollIntoView({ behavior: 'smooth' });
                     }, 50);
                 } else {
-                    window.scrollTo(0, 0);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
                 }
             } else {
                 mainContent.classList.add('hidden');
@@ -45,18 +47,9 @@
                 renderDetail(viewId);
                 window.scrollTo(0, 0);
             }
-            
-            // Cerrar menú móvil si está abierto
-            const mobileMenu = document.getElementById('mobile-menu');
-            if (!mobileMenu.classList.contains('hidden')) toggleMenu();
         }
 
-        function toggleMenu() {
-            const menu = document.getElementById('mobile-menu');
-            menu.classList.toggle('hidden');
-        }
-
-        // Base de datos de contenido para productos y servicios
+        // Datos EXACTOS del archivo original
         const contentData = {
             'cavas': {
                 title: 'Cavas Cuarto Industriales',
@@ -103,7 +96,7 @@
                 subtitle: 'Montaje de Paneles Modulares para Cavas y Equipos Frigoríficos',
                 img: 'img/instalacion.png',
                 fallback: 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?q=80&w=1000',
-                desc: 'Contamos con cuadrillas especializadas para el montaje de unidades condensadoras, evaporadores, racks de compresión y tendido de tuberías de refrigeración siguiendo estándares internacionales.',
+                desc: 'Contamos con cuadrillas especializadas para el montaje profesional de Paneeles Aislante de Piso, Panel Lateral y Techos, así como unidades condensadoras y evaporadores.',
                 specs: ['Instalación de tuberías de cobre y acero', 'Aislamiento de líneas de succión', 'Carga de refrigerantes ecológicos', 'Pruebas de estanqueidad y vacío profundo']
             },
             'obra-civil': {
@@ -119,7 +112,7 @@
                 subtitle: 'Protección y Aislamiento de Tuberías',
                 img: 'img/enchaquetado.png',
                 fallback: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=1000',
-                desc: 'Protegemos su inversión con recubrimientos en aluminio o acero inoxidable para tuberías aisladas, evitando el deterioro del aislamiento por rayos UV o impactos mecánicos.',
+                desc: 'Aislamiento con Poliuretano de tuberías con recubrimiento de aluminio o acero inoxidable para evitar el deterioro por rayos UV o impactos mecánicos.',
                 specs: ['Acabados estéticos y duraderos', 'Protección contra corrosión externa', 'Reducción de pérdidas térmicas', 'Fácil limpieza y mantenimiento']
             },
             'soldadura': {
@@ -141,36 +134,28 @@
         };
 
         function renderDetail(id) {
-            const data = contentData[id] || { 
-                title: 'Servicio Especializado', 
-                subtitle: 'Corporación Frío Box', 
-                desc: 'Estamos preparando el contenido detallado de este servicio. Contáctenos para más información técnica.',
-                specs: ['Calidad Garantizada', 'Personal Calificado', 'Normas COVENIN'],
-                img: '',
-                fallback: 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?q=80&w=1000'
-            };
-
+            const data = contentData[id];
             const html = `
-                <div class="max-w-7xl mx-auto px-4 py-12 md:py-24">
-                    <button onclick="navigate('home')" class="mb-8 flex items-center gap-2 text-fbBlue font-black uppercase italic hover:text-fbRed transition-colors">
-                        <i class="fa-solid fa-arrow-left"></i> Volver al Inicio
+                <div class="max-w-4xl mx-auto px-4 py-6 animate-fade-in">
+                    <button onclick="navigate('home')" class="mb-4 flex items-center gap-2 text-fbBlue font-black uppercase italic text-sm">
+                        <i class="fa-solid fa-chevron-left"></i> Volver
                     </button>
-                    <div class="grid lg:grid-cols-2 gap-16 items-start">
-                        <div class="rounded-[3rem] overflow-hidden shadow-2xl border-8 border-white">
-                            <img src="${data.img}" alt="${data.title}" class="w-full h-auto object-cover" onerror="this.src='${data.fallback}'">
+                    <div class="bg-white rounded-[2.5rem] overflow-hidden shadow-xl border border-slate-100">
+                        <div class="h-56 md:h-96 overflow-hidden">
+                            <img src="${data.img}" alt="${data.title}" class="w-full h-full object-cover" onerror="this.src='${data.fallback}'">
                         </div>
-                        <div>
-                            <span class="bg-fbRed text-white px-4 py-1 font-black uppercase text-xs italic tracking-widest">${data.subtitle}</span>
-                            <h2 class="text-4xl md:text-6xl font-black text-fbBlue uppercase italic mt-4 mb-6 leading-none">${data.title}</h2>
-                            <p class="text-lg text-slate-600 mb-8 leading-relaxed font-medium">${data.desc}</p>
-                            <div class="bg-fbBlue p-8 rounded-[2rem] text-white">
-                                <h4 class="font-black uppercase italic mb-4 border-b border-white/20 pb-2">Especificaciones Técnicas</h4>
-                                <ul class="space-y-3">
-                                    ${data.specs.map(s => `<li class="flex items-center gap-3 text-sm font-medium"><i class="fa-solid fa-check text-fbRed"></i> ${s}</li>`).join('')}
+                        <div class="p-6 md:p-10 space-y-4">
+                            <span class="inline-block bg-fbRed text-white px-3 py-1 font-black uppercase text-[10px] italic tracking-widest rounded-md">${data.subtitle}</span>
+                            <h2 class="text-3xl md:text-5xl font-black text-fbBlue uppercase italic leading-tight">${data.title}</h2>
+                            <p class="text-slate-600 leading-relaxed font-medium text-sm md:text-lg">${data.desc}</p>
+                            <div class="bg-fbBlue p-6 rounded-[1.5rem] text-white">
+                                <h4 class="font-black uppercase italic mb-4 text-xs border-b border-white/10 pb-2">Especificaciones Técnicas</h4>
+                                <ul class="grid grid-cols-1 gap-3">
+                                    ${data.specs.map(s => `<li class="flex items-start gap-3 text-xs md:text-sm font-medium"><i class="fa-solid fa-check text-fbRed mt-1"></i> ${s}</li>`).join('')}
                                 </ul>
                             </div>
-                            <div class="mt-8">
-                                <a href="#contacto" onclick="navigate('home')" class="inline-block bg-fbRed text-white px-8 py-4 rounded-xl font-black uppercase italic shadow-lg hover:scale-105 transition-transform">Solicitar Cotización</a>
+                            <div class="pt-4">
+                                <a href="https://wa.me/584245388701" class="block w-full text-center bg-fbRed text-white py-4 rounded-xl font-black uppercase italic shadow-lg active:scale-95 transition-transform">Consultar Precio</a>
                             </div>
                         </div>
                     </div>
@@ -179,306 +164,280 @@
             document.getElementById('detail-content').innerHTML = html;
         }
 
-        // Sistema de Chat IA (Básico)
         function enviarConsulta() {
             const input = document.getElementById('user-msg');
             const chatBox = document.getElementById('chat-box');
             if (!input.value.trim()) return;
-
             const userText = input.value;
-            chatBox.innerHTML += `
-                <div class="flex items-start gap-4 justify-end">
-                    <div class="bg-fbBlue text-white p-6 rounded-3xl rounded-tr-none shadow-md text-sm font-medium max-w-[85%]">
-                        ${userText}
-                    </div>
-                </div>
-            `;
+            chatBox.innerHTML += `<div class="flex justify-end"><div class="bg-fbBlue text-white p-4 rounded-2xl rounded-tr-none shadow-md text-xs font-medium max-w-[85%]">${userText}</div></div>`;
             input.value = "";
-            chatBox.scrollTo(0, chatBox.scrollHeight);
-
-            // Respuesta simulada mientras se integra la API
+            chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: 'smooth' });
             setTimeout(() => {
-                chatBox.innerHTML += `
-                    <div class="flex items-start gap-4">
-                        <div class="w-10 h-10 bg-fbBlue text-white rounded-xl flex items-center justify-center text-xs font-bold flex-shrink-0">FB</div>
-                        <div class="bg-white p-6 rounded-3xl rounded-tl-none shadow-md border border-slate-100 text-sm leading-relaxed max-w-[85%] text-slate-700 font-medium italic">
-                            Procesando su requerimiento técnico... Un asesor revisará sus datos para enviarle una propuesta formal.
-                        </div>
-                    </div>
-                `;
-                chatBox.scrollTo(0, chatBox.scrollHeight);
-            }, 1000);
+                chatBox.innerHTML += `<div class="flex items-start gap-2"><div class="w-8 h-8 bg-fbBlue text-white rounded-lg flex items-center justify-center text-[10px] font-bold">FB</div><div class="bg-white p-4 rounded-2xl rounded-tl-none shadow-sm border border-slate-100 text-xs text-slate-700 italic">Procesando solicitud... un asesor técnico le responderá en breve.</div></div>`;
+                chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: 'smooth' });
+            }, 800);
         }
     </script>
     <style>
-        
-        :target {
-            scroll-margin-top: 120px;
-        }
-        .shadow-3xl {
-            box-shadow: 0 35px 60px -15px rgba(0, 51, 102, 0.3);
-        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
+        body { -webkit-tap-highlight-color: transparent; }
+        .mobile-safe-area { padding-bottom: 80px; }
+        @media (min-width: 768px) { .mobile-safe-area { padding-bottom: 0; } }
     </style>
 </head>
-<body class="bg-fbLightGray font-sans text-slate-900 geometric-bg">
+<body class="bg-fbLightGray font-sans text-slate-900 mobile-safe-area">
 
-    <!-- MENÚ DE NAVEGACIÓN -->
-    <nav class="bg-fbBlue shadow-xl sticky top-0 z-50 border-b-4 border-fbRed">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center py-4 lg:py-2">
-                <div class="flex-shrink-0 flex items-center cursor-pointer" onclick="navigate('home')">
-                    <div class="bg-white p-2 rounded-xl shadow-lg border-2 border-fbRed flex items-center justify-center overflow-hidden" style="width: 80px; height: 80px;">
-                        <img src="img/logo.png" alt="Corporación Frío Box" class="max-w-full max-h-full object-contain" onerror="this.src='https://via.placeholder.com/400x400/FFFFFF/D31B22?text=FRIO+BOX'">
-                    </div>
-                    <div class="ml-4 hidden lg:block">
-                        <span class="block text-xl font-black text-white leading-tight tracking-tighter">CORPORACIÓN<br>FRÍO BOX</span>
-                        <span class="text-[10px] tracking-[0.3em] text-fbRed font-bold uppercase italic">Soluciones Térmicas</span>
-                    </div>
+    <!-- DESKTOP NAV (Oculto en móvil) -->
+    <nav class="bg-fbBlue shadow-xl sticky top-0 z-50 border-b-4 border-fbRed hidden md:block">
+        <div class="max-w-7xl mx-auto px-4 h-20 flex justify-between items-center">
+            <div class="flex items-center cursor-pointer" onclick="navigate('home')">
+                <div class="bg-white p-1 rounded-lg border border-fbRed w-12 h-12 flex items-center justify-center">
+                    <img src="img/logo.png" alt="FB" class="max-w-full object-contain" onerror="this.src='https://via.placeholder.com/80/FFFFFF/D31B22?text=FB'">
                 </div>
-
-                <div class="hidden md:flex space-x-6 lg:space-x-10 items-center">
-                    <button onclick="navigate('home')" class="text-white hover:text-fbRed font-bold uppercase text-sm tracking-widest transition-colors">Inicio</button>
-                    <a href="#productos" onclick="navigate('home')" class="text-white hover:text-fbRed font-bold uppercase text-sm tracking-widest transition-colors">Productos</a>
-                    <a href="#servicios" onclick="navigate('home')" class="text-white hover:text-fbRed font-bold uppercase text-sm tracking-widest transition-colors">Servicios</a>
-                    <a href="#contacto" onclick="navigate('home')" class="text-white hover:text-fbRed font-bold uppercase text-sm tracking-widest transition-colors">Contacto</a>
-                    <a href="#asistente" onclick="navigate('home')" class="bg-fbRed text-white px-6 py-3 rounded-xl hover:bg-white hover:text-fbRed transition-all shadow-lg font-black text-xs uppercase italic">
-                        <i class="fa-solid fa-robot mr-2"></i>Asistente IA
-                    </a>
-                </div>
-
-                <div class="md:hidden">
-                    <button onclick="toggleMenu()" class="text-white focus:outline-none p-3 bg-fbDarkBlue rounded-lg">
-                        <i class="fa-solid fa-bars text-3xl"></i>
-                    </button>
+                <div class="ml-3 text-white">
+                    <span class="block text-lg font-black leading-none uppercase italic">Corporación <span class="text-fbRed">Frío Box</span></span>
+                    <span class="text-[8px] tracking-[0.3em] font-bold uppercase">Ingeniería Térmica</span>
                 </div>
             </div>
-        </div>
-
-        <div id="mobile-menu" class="hidden md:hidden bg-fbDarkBlue border-t border-fbRed/30 px-4 pt-4 pb-8 space-y-2">
-            <button onclick="navigate('home')" class="block w-full text-left text-white py-4 border-b border-white/5 font-bold uppercase tracking-widest">Inicio</button>
-            <a href="#productos" onclick="navigate('home')" class="block text-white py-4 border-b border-white/5 font-bold uppercase tracking-widest text-left">Productos</a>
-            <a href="#servicios" onclick="navigate('home')" class="block text-white py-4 border-b border-white/5 font-bold uppercase tracking-widest text-left">Servicios</a>
-            <a href="#contacto" onclick="navigate('home')" class="block text-white py-4 border-b border-white/5 font-bold uppercase tracking-widest text-left">Contacto</a>
-            <a href="#asistente" onclick="navigate('home')" class="block bg-fbRed text-center text-white py-5 rounded-xl font-black mt-6 italic uppercase">Calculadora IA</a>
+            <div class="flex gap-8 items-center">
+                <button onclick="navigate('home')" class="text-white hover:text-fbRed font-bold uppercase text-xs tracking-widest transition-colors">Inicio</button>
+                <a href="#productos" onclick="navigate('home')" class="text-white hover:text-fbRed font-bold uppercase text-xs tracking-widest transition-colors">Productos</a>
+                <a href="#servicios" onclick="navigate('home')" class="text-white hover:text-fbRed font-bold uppercase text-xs tracking-widest transition-colors">Servicios</a>
+                <a href="#contacto" onclick="navigate('home')" class="bg-fbRed text-white px-5 py-2 rounded-xl font-black text-[10px] uppercase italic">Contacto</a>
+            </div>
         </div>
     </nav>
 
-    <!-- VISTA PRINCIPAL -->
+    <!-- MOBILE HEADER -->
+    <div class="md:hidden sticky top-0 z-50 bg-fbBlue px-4 py-3 flex items-center justify-between border-b-2 border-fbRed shadow-lg">
+        <div class="flex items-center gap-2" onclick="navigate('home')">
+            <div class="bg-white w-9 h-9 rounded-lg p-1">
+                <img src="img/logo.png" alt="FB" class="w-full h-full object-contain" onerror="this.src='https://via.placeholder.com/80/FFFFFF/D31B22?text=FB'">
+            </div>
+            <span class="text-white font-black italic uppercase text-sm">FRÍO <span class="text-fbRed">BOX</span></span>
+        </div>
+        <a href="https://wa.me/584245388701" target="_blank" class="bg-fbRed text-white px-4 py-1.5 rounded-lg text-[10px] font-black uppercase italic">Chat Directo</a>
+    </div>
+
+    <!-- MAIN CONTENT -->
     <main id="main-content">
         <!-- HERO -->
-        <section id="inicio" class="relative pt-16 pb-20 md:pt-32 md:pb-40 overflow-hidden px-4">
-            <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
-                <div class="z-10 text-center lg:text-left">
-                    <div class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-fbBlue text-white text-xs font-black uppercase tracking-widest mb-8">
-                        <i class="fa-solid fa-location-dot text-fbRed"></i> Barquisimeto - Venezuela
-                    </div>
-                    <h1 class="text-5xl md:text-8xl font-black text-fbBlue leading-[0.9] mb-8 tracking-tighter uppercase italic">
+        <section id="inicio" class="relative pt-8 pb-12 md:pt-32 md:pb-40 px-4">
+            <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-10 items-center">
+                <div class="text-center lg:text-left animate-fade-in">
+                    <span class="inline-block px-3 py-1 rounded-full bg-fbBlue/10 text-fbBlue text-[10px] font-black uppercase tracking-widest mb-4">Venezuela | Barquisimeto</span>
+                    <h1 class="text-4xl md:text-8xl font-black text-fbBlue leading-none mb-4 md:mb-8 tracking-tighter uppercase italic">
                         Frío de <br><span class="text-fbRed">Alto Nivel</span>
                     </h1>
-                    <p class="text-lg md:text-xl text-slate-600 mb-12 max-w-xl mx-auto lg:mx-0 leading-relaxed font-medium">
-                        Diseñamos y construimos la infraestructura térmica que su industria necesita. Especialistas en cavas cuarto, túneles IQF y sistemas de transporte aéreo.
+                    <p class="text-sm md:text-xl text-slate-600 mb-8 max-w-lg mx-auto lg:mx-0 font-medium">
+                        Infraestructura térmica industrial. Especialistas en cavas cuarto y sistemas de transporte aéreo.
                     </p>
-                    <div class="flex flex-col sm:flex-row gap-5 justify-center lg:justify-start">
-                        <a href="#contacto" class="bg-fbBlue text-white px-10 py-5 rounded-2xl font-black uppercase italic shadow-2xl shadow-fbBlue/40 hover:bg-fbRed hover:-translate-y-1 transition-all text-center">Cotizar Proyecto</a>
-                        <a href="#asistente" class="bg-white border-4 border-fbBlue text-fbBlue px-10 py-5 rounded-2xl font-black uppercase italic hover:bg-fbBlue hover:text-white transition-all text-center">Consultar con IA</a>
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <a href="#contacto" class="bg-fbBlue text-white px-8 py-4 rounded-xl font-black uppercase italic shadow-lg text-center text-xs">Solicitar Proyecto</a>
+                        <a href="#asistente" class="bg-white border-2 border-fbBlue text-fbBlue px-8 py-4 rounded-xl font-black uppercase italic text-center text-xs">Consultor IA</a>
                     </div>
                 </div>
-                
-                <div class="relative mt-12 lg:mt-0">
-                    <div class="relative h-[500px] bg-white rounded-[4rem] shadow-2xl overflow-hidden border-[12px] border-white">
-                        <img src="img/hero.png" alt="Instalación Industrial" class="w-full h-full object-cover" onerror="this.src='https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=800'">
-                        <div class="absolute inset-0 bg-gradient-to-t from-fbBlue/80 via-transparent to-transparent"></div>
+                <div class="hidden md:block relative">
+                    <div class="bg-white p-3 rounded-[3rem] shadow-2xl border border-slate-100">
+                        <img src="img/hero.png" alt="Ingeniería" class="w-full h-[500px] object-cover rounded-[2.5rem]" onerror="this.src='https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=800'">
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- SECCIÓN PRODUCTOS -->
-        <section id="productos" class="py-24 bg-white">
+        <!-- PRODUCTOS (2 Columnas en móvil) -->
+        <section id="productos" class="py-10 md:py-24 bg-white rounded-t-[2.5rem] shadow-2xl">
             <div class="max-w-7xl mx-auto px-4">
-                <div class="text-center mb-16">
-                    <h2 class="text-5xl font-black text-fbBlue uppercase italic tracking-tighter">Catálogo <br><span class="text-fbRed italic underline decoration-4 underline-offset-8">Industrial</span></h2>
+                <div class="mb-8 text-center md:text-left">
+                    <h2 class="text-3xl md:text-5xl font-black text-fbBlue uppercase italic">Productos</h2>
+                    <div class="h-1 w-12 bg-fbRed mt-2 mx-auto md:mx-0"></div>
                 </div>
                 
-                <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                    <div onclick="navigate('cavas')" class="group cursor-pointer bg-fbLightGray rounded-[3rem] p-4 hover:bg-fbBlue transition-all duration-500 shadow-sm hover:shadow-2xl">
-                        <div class="aspect-square rounded-[2.5rem] overflow-hidden mb-6">
-                            <img src="img/cava.png" alt="Cavas" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" onerror="this.src='https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=500'">
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-8">
+                    <!-- Cards Compactas para App -->
+                    <div onclick="navigate('cavas')" class="bg-fbLightGray rounded-3xl p-2 md:p-4 border border-slate-100 group cursor-pointer active:bg-slate-200 transition-colors">
+                        <div class="aspect-square rounded-2xl overflow-hidden mb-3">
+                            <img src="img/cava.png" alt="Cavas" class="w-full h-full object-cover group-hover:scale-110 transition-transform" onerror="this.src='https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=500'">
                         </div>
-                        <div class="px-4 pb-6 text-center">
-                            <h3 class="font-black text-fbBlue group-hover:text-white uppercase italic text-xl mb-2 transition-colors">Cavas Cuarto</h3>
-                            <span class="text-fbRed font-bold group-hover:text-white text-xs uppercase tracking-widest">Ver Detalles <i class="fa-solid fa-arrow-right ml-1"></i></span>
-                        </div>
+                        <h3 class="font-black text-fbBlue uppercase italic text-[11px] md:text-lg text-center leading-tight">Cavas Cuarto</h3>
                     </div>
 
-                    <div onclick="navigate('tuneles')" class="group cursor-pointer bg-fbLightGray rounded-[3rem] p-4 hover:bg-fbBlue transition-all duration-500 shadow-sm hover:shadow-2xl">
-                        <div class="aspect-square rounded-[2.5rem] overflow-hidden mb-6">
-                            <img src="img/tunel.png" alt="Túneles" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" onerror="this.src='https://images.unsplash.com/photo-1517059224940-d4af9eec41b7?q=80&w=500'">
+                    <div onclick="navigate('tuneles')" class="bg-fbLightGray rounded-3xl p-2 md:p-4 border border-slate-100 group cursor-pointer active:bg-slate-200 transition-colors">
+                        <div class="aspect-square rounded-2xl overflow-hidden mb-3">
+                            <img src="img/tunel.png" alt="Túneles" class="w-full h-full object-cover group-hover:scale-110 transition-transform" onerror="this.src='https://images.unsplash.com/photo-1517059224940-d4af9eec41b7?q=80&w=500'">
                         </div>
-                        <div class="px-4 pb-6 text-center">
-                            <h3 class="font-black text-fbBlue group-hover:text-white uppercase italic text-xl mb-2 transition-colors">Túneles IQF</h3>
-                            <span class="text-fbRed font-bold group-hover:text-white text-xs uppercase tracking-widest">Ver Detalles <i class="fa-solid fa-arrow-right ml-1"></i></span>
-                        </div>
+                        <h3 class="font-black text-fbBlue uppercase italic text-[11px] md:text-lg text-center leading-tight">Túneles IQF</h3>
                     </div>
 
-                    <div onclick="navigate('rieles')" class="group cursor-pointer bg-fbLightGray rounded-[3rem] p-4 hover:bg-fbBlue transition-all duration-500 shadow-sm hover:shadow-2xl">
-                        <div class="aspect-square rounded-[2.5rem] overflow-hidden mb-6">
-                            <img src="img/rieles.png" alt="Rieles" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" onerror="this.src='https://images.unsplash.com/photo-1590856029826-c7a73142bbf1?q=80&w=500'">
+                    <div onclick="navigate('rieles')" class="bg-fbLightGray rounded-3xl p-2 md:p-4 border border-slate-100 group cursor-pointer active:bg-slate-200 transition-colors">
+                        <div class="aspect-square rounded-2xl overflow-hidden mb-3">
+                            <img src="img/rieles.png" alt="Rieles" class="w-full h-full object-cover group-hover:scale-110 transition-transform" onerror="this.src='https://images.unsplash.com/photo-1590856029826-c7a73142bbf1?q=80&w=500'">
                         </div>
-                        <div class="px-4 pb-6 text-center">
-                            <h3 class="font-black text-fbBlue group-hover:text-white uppercase italic text-xl mb-2 transition-colors">Rielería</h3>
-                            <span class="text-fbRed font-bold group-hover:text-white text-xs uppercase tracking-widest">Ver Detalles <i class="fa-solid fa-arrow-right ml-1"></i></span>
-                        </div>
+                        <h3 class="font-black text-fbBlue uppercase italic text-[11px] md:text-lg text-center leading-tight">Rielería</h3>
                     </div>
 
-                    <div onclick="navigate('puertas')" class="group cursor-pointer bg-fbLightGray rounded-[3rem] p-4 hover:bg-fbBlue transition-all duration-500 shadow-sm hover:shadow-2xl">
-                        <div class="aspect-square rounded-[2.5rem] overflow-hidden mb-6">
-                            <img src="img/puerta.png" alt="Puertas" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" onerror="this.src='https://images.unsplash.com/photo-1516937941344-00b4e0337589?q=80&w=500'">
+                    <div onclick="navigate('puertas')" class="bg-fbLightGray rounded-3xl p-2 md:p-4 border border-slate-100 group cursor-pointer active:bg-slate-200 transition-colors">
+                        <div class="aspect-square rounded-2xl overflow-hidden mb-3">
+                            <img src="img/puerta.png" alt="Puertas" class="w-full h-full object-cover group-hover:scale-110 transition-transform" onerror="this.src='https://images.unsplash.com/photo-1516937941344-00b4e0337589?q=80&w=500'">
                         </div>
-                        <div class="px-4 pb-6 text-center">
-                            <h3 class="font-black text-fbBlue group-hover:text-white uppercase italic text-xl mb-2 transition-colors">Puertas</h3>
-                            <span class="text-fbRed font-bold group-hover:text-white text-xs uppercase tracking-widest">Ver Detalles <i class="fa-solid fa-arrow-right ml-1"></i></span>
-                        </div>
+                        <h3 class="font-black text-fbBlue uppercase italic text-[11px] md:text-lg text-center leading-tight">Puertas</h3>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- SECCIÓN SERVICIOS -->
-        <section id="servicios" class="py-24 bg-fbBlue text-white">
-            <div class="max-w-7xl mx-auto px-4 text-center">
-                <h2 class="text-5xl font-black uppercase italic tracking-tighter mb-16 leading-none">Servicios <br><span class="text-fbRed italic underline decoration-4 underline-offset-8 uppercase">Especializados</span></h2>
-                
-                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <div onclick="navigate('proyectos-bim')" class="bg-white/10 p-8 rounded-[2rem] border border-white/10 hover:bg-fbRed transition-all cursor-pointer text-left group">
-                        <i class="fa-solid fa-cube text-3xl mb-4 group-hover:scale-110 transition-transform block"></i>
-                        <h3 class="text-2xl font-black italic uppercase mb-2">Proyectos BIM</h3>
-                        <p class="text-sm text-white/70 mb-4 font-medium">Modelado 3D y simulación de carga térmica computarizada.</p>
-                        <span class="text-fbRed group-hover:text-white font-black text-xs uppercase italic">Explorar <i class="fa-solid fa-chevron-right ml-1"></i></span>
+        <!-- SERVICIOS (Estilo Lista de App) -->
+        <section id="servicios" class="py-12 bg-fbBlue text-white">
+            <div class="max-w-7xl mx-auto px-4">
+                <h2 class="text-2xl md:text-5xl font-black uppercase italic mb-8 text-center md:text-left">Servicios</h2>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <!-- Items de Lista App -->
+                    <div onclick="navigate('proyectos-bim')" class="flex items-center gap-4 p-4 bg-white/5 rounded-2xl border border-white/10 active:bg-fbRed transition-colors cursor-pointer group">
+                        <div class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center text-lg"><i class="fa-solid fa-cube"></i></div>
+                        <div class="flex-1">
+                            <h3 class="font-black italic uppercase text-xs md:text-base">Proyectos BIM</h3>
+                            <p class="text-[9px] text-white/50 uppercase font-bold">Modelado e Ingeniería</p>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-white/20"></i>
                     </div>
 
-                    <div onclick="navigate('instalacion')" class="bg-white/10 p-8 rounded-[2rem] border border-white/10 hover:bg-fbRed transition-all cursor-pointer text-left group">
-                        <i class="fa-solid fa-screwdriver-wrench text-3xl mb-4 group-hover:scale-110 transition-transform block"></i>
-                        <h3 class="text-2xl font-black italic uppercase mb-2">Instalación</h3>
-                        <p class="text-sm text-white/70 mb-4 font-medium">Montaje profesional de Paneeles Aislante de Piso, Panel Lateral y Techos.</p>
-                        <span class="text-fbRed group-hover:text-white font-black text-xs uppercase italic">Explorar <i class="fa-solid fa-chevron-right ml-1"></i></span>
+                    <div onclick="navigate('instalacion')" class="flex items-center gap-4 p-4 bg-white/5 rounded-2xl border border-white/10 active:bg-fbRed transition-colors cursor-pointer group">
+                        <div class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center text-lg"><i class="fa-solid fa-screwdriver-wrench"></i></div>
+                        <div class="flex-1">
+                            <h3 class="font-black italic uppercase text-xs md:text-base">Instalación</h3>
+                            <p class="text-[9px] text-white/50 uppercase font-bold">Montaje Profesional</p>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-white/20"></i>
                     </div>
 
-                    <div onclick="navigate('obra-civil')" class="bg-white/10 p-8 rounded-[2rem] border border-white/10 hover:bg-fbRed transition-all cursor-pointer text-left group">
-                        <i class="fa-solid fa-trowel-bricks text-3xl mb-4 group-hover:scale-110 transition-transform block"></i>
-                        <h3 class="text-2xl font-black italic uppercase mb-2">Obra Civil</h3>
-                        <p class="text-sm text-white/70 mb-4 font-medium">Losas de pisos aisladas para cavas y brocales sanitarios.</p>
-                        <span class="text-fbRed group-hover:text-white font-black text-xs uppercase italic">Explorar <i class="fa-solid fa-chevron-right ml-1"></i></span>
+                    <div onclick="navigate('obra-civil')" class="flex items-center gap-4 p-4 bg-white/5 rounded-2xl border border-white/10 active:bg-fbRed transition-colors cursor-pointer group">
+                        <div class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center text-lg"><i class="fa-solid fa-trowel-bricks"></i></div>
+                        <div class="flex-1">
+                            <h3 class="font-black italic uppercase text-xs md:text-base">Obra Civil</h3>
+                            <p class="text-[9px] text-white/50 uppercase font-bold">Losas e Infraestructura</p>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-white/20"></i>
                     </div>
 
-                    <div onclick="navigate('enchaquetado')" class="bg-white/10 p-8 rounded-[2rem] border border-white/10 hover:bg-fbRed transition-all cursor-pointer text-left group">
-                        <i class="fa-solid fa-shield-halved text-3xl mb-4 group-hover:scale-110 transition-transform block"></i>
-                        <h3 class="text-2xl font-black italic uppercase mb-2">Enchaquetado</h3>
-                        <p class="text-sm text-white/70 mb-4 font-medium">Aislamiento con Poliuretano de tuberías con recubrimiento de aluminio o acero.</p>
-                        <span class="text-fbRed group-hover:text-white font-black text-xs uppercase italic">Explorar <i class="fa-solid fa-chevron-right ml-1"></i></span>
+                    <div onclick="navigate('enchaquetado')" class="flex items-center gap-4 p-4 bg-white/5 rounded-2xl border border-white/10 active:bg-fbRed transition-colors cursor-pointer group">
+                        <div class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center text-lg"><i class="fa-solid fa-shield-halved"></i></div>
+                        <div class="flex-1">
+                            <h3 class="font-black italic uppercase text-xs md:text-base">Enchaquetado</h3>
+                            <p class="text-[9px] text-white/50 uppercase font-bold">Aislamiento Térmico</p>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-white/20"></i>
                     </div>
 
-                    <div onclick="navigate('soldadura')" class="bg-white/10 p-8 rounded-[2rem] border border-white/10 hover:bg-fbRed transition-all cursor-pointer text-left group">
-                        <i class="fa-solid fa-fire text-3xl mb-4 group-hover:scale-110 transition-transform block"></i>
-                        <h3 class="text-2xl font-black italic uppercase mb-2">Soldadura Prof.</h3>
-                        <p class="text-sm text-white/70 mb-4 font-medium">Soldadura orbital y tig para sistemas frigoríficos de alta presión.</p>
-                        <span class="text-fbRed group-hover:text-white font-black text-xs uppercase italic">Explorar <i class="fa-solid fa-chevron-right ml-1"></i></span>
+                    <div onclick="navigate('soldadura')" class="flex items-center gap-4 p-4 bg-white/5 rounded-2xl border border-white/10 active:bg-fbRed transition-colors cursor-pointer group">
+                        <div class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center text-lg"><i class="fa-solid fa-fire"></i></div>
+                        <div class="flex-1">
+                            <h3 class="font-black italic uppercase text-xs md:text-base">Soldadura</h3>
+                            <p class="text-[9px] text-white/50 uppercase font-bold">Procesos Especializados</p>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-white/20"></i>
                     </div>
 
-                    <div onclick="navigate('mantenimiento')" class="bg-white/10 p-8 rounded-[2rem] border border-white/10 hover:bg-fbRed transition-all cursor-pointer text-left group">
-                        <i class="fa-solid fa-snowflake text-3xl mb-4 group-hover:scale-110 transition-transform block"></i>
-                        <h3 class="text-2xl font-black italic uppercase mb-2">Refrigeración</h3>
-                        <p class="text-sm text-white/70 mb-4 font-medium">Mantenimiento preventivo y correctivo de plantas industriales.</p>
-                        <span class="text-fbRed group-hover:text-white font-black text-xs uppercase italic">Explorar <i class="fa-solid fa-chevron-right ml-1"></i></span>
+                    <div onclick="navigate('mantenimiento')" class="flex items-center gap-4 p-4 bg-white/5 rounded-2xl border border-white/10 active:bg-fbRed transition-colors cursor-pointer group">
+                        <div class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center text-lg"><i class="fa-solid fa-snowflake"></i></div>
+                        <div class="flex-1">
+                            <h3 class="font-black italic uppercase text-xs md:text-base">Refrigeración</h3>
+                            <p class="text-[9px] text-white/50 uppercase font-bold">Planes Preventivos</p>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-white/20"></i>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- ASISTENTE IA -->
-        <section id="asistente" class="py-24 bg-white px-4">
-            <div class="max-w-4xl mx-auto">
-                <div class="text-center mb-16">
-                    <div class="w-20 h-20 bg-fbRed text-white rounded-3xl flex items-center justify-center text-4xl mx-auto mb-6 shadow-xl rotate-12">
-                        <i class="fa-solid fa-brain"></i>
+        <!-- ASISTENTE IA (Estilo Chat App) -->
+        <section id="asistente" class="py-12 px-4 bg-white">
+            <div class="max-w-xl mx-auto">
+                <div class="bg-fbDarkBlue rounded-[2rem] overflow-hidden shadow-2xl flex flex-col border border-fbRed/20">
+                    <div class="p-4 bg-fbBlue flex items-center gap-3">
+                        <div class="w-10 h-10 bg-fbRed rounded-lg flex items-center justify-center text-white text-xl"><i class="fa-solid fa-robot"></i></div>
+                        <div>
+                            <p class="text-[10px] text-white/50 font-black uppercase">Calculadora Frío Box</p>
+                            <p class="text-xs text-white font-bold italic uppercase">Asistente de Ingeniería</p>
+                        </div>
                     </div>
-                    <h2 class="text-4xl font-black text-fbBlue italic uppercase tracking-tighter">Consultor de Ingeniería IA</h2>
-                    <p class="text-slate-500 font-medium mt-4 italic">Cálculos técnicos precisos al instante.</p>
-                </div>
-                
-                <div class="bg-fbDarkBlue rounded-[3rem] shadow-3xl overflow-hidden border-[12px] border-fbDarkBlue ring-1 ring-fbRed">
-                    <div id="chat-box" class="h-[450px] overflow-y-auto p-8 space-y-6 bg-slate-50">
-                        <div class="flex items-start gap-4">
-                            <div class="w-10 h-10 bg-fbBlue text-white rounded-xl flex items-center justify-center text-xs font-bold shadow-lg flex-shrink-0">FB</div>
-                            <div class="bg-white p-6 rounded-3xl rounded-tl-none shadow-md border border-slate-100 text-sm md:text-base leading-relaxed max-w-[85%] text-slate-700 font-medium">
-                                Saludos. Soy la unidad de cálculo de **Frío Box**. <br><br>Para ayudarle, dígame: **¿Qué producto desea almacenar, qué cantidad (toneladas o cestas) y dónde se ubica su proyecto?**
+                    <div id="chat-box" class="h-64 overflow-y-auto p-4 space-y-4 bg-slate-50 text-[11px] md:text-sm">
+                        <div class="flex items-start gap-2">
+                            <div class="w-7 h-7 bg-fbBlue text-white rounded-lg flex items-center justify-center text-[9px] font-bold">FB</div>
+                            <div class="bg-white p-3 rounded-2xl rounded-tl-none shadow-sm border border-slate-100 font-medium">
+                                Indíqueme el **producto, toneladas y ubicación** para generar un cálculo técnico.
                             </div>
                         </div>
                     </div>
-                    <div class="p-6 bg-fbDarkBlue flex flex-col sm:flex-row gap-4">
-                        <input type="text" id="user-msg" placeholder="Ej: Cava para 20 ton de pollo en Quíbor..." class="flex-1 p-5 rounded-2xl focus:outline-none focus:ring-4 focus:ring-fbRed text-sm font-medium">
-                        <button onclick="enviarConsulta()" class="bg-fbRed text-white px-10 py-5 rounded-2xl font-black uppercase italic hover:bg-white hover:text-fbRed transition-all shadow-xl">
-                            Calcular
-                        </button>
+                    <div class="p-3 bg-fbDarkBlue flex gap-2">
+                        <input type="text" id="user-msg" placeholder="Ej: 20 Ton Pollo en Barinas" class="flex-1 p-3 rounded-xl focus:outline-none text-xs font-bold">
+                        <button onclick="enviarConsulta()" class="bg-fbRed text-white px-4 rounded-xl active:scale-90 transition-transform"><i class="fa-solid fa-paper-plane"></i></button>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- CONTACTO -->
-        <section id="contacto" class="py-24 bg-fbLightGray border-t border-slate-200 px-4">
-            <div class="max-w-7xl mx-auto grid md:grid-cols-2 gap-16 lg:gap-32">
-                <div>
-                    <h2 class="text-5xl font-black italic uppercase mb-8 tracking-tighter leading-none text-fbBlue">Contacto <br><span class="text-fbRed italic underline decoration-4 underline-offset-8">Directo</span></h2>
-                    <div class="space-y-4">
-                        <div class="flex items-center gap-6 p-6 bg-white rounded-3xl shadow-sm border border-slate-100">
-                            <i class="fa-solid fa-map-location-dot text-2xl text-fbRed"></i>
-                            <span class="font-bold text-slate-700">Barquisimeto, Estado Lara.</span>
+        <section id="contacto" class="py-12 bg-fbLightGray border-t border-slate-200 px-4">
+            <div class="max-w-7xl mx-auto space-y-6">
+                <h2 class="text-3xl font-black text-fbBlue uppercase italic text-center">Contacto</h2>
+                <div class="grid md:grid-cols-2 gap-4 items-center">
+                    <div class="space-y-2">
+                        <div class="flex items-center gap-4 p-4 bg-white rounded-2xl shadow-sm border border-slate-100">
+                            <i class="fa-solid fa-phone text-fbRed"></i>
+                            <span class="font-bold text-slate-700 text-xs">+58 424-5388701</span>
                         </div>
-                        <div class="flex items-center gap-6 p-6 bg-white rounded-3xl shadow-sm border border-slate-100">
-                            <i class="fa-solid fa-phone text-2xl text-fbRed"></i>
-                            <span class="font-bold text-slate-700">+58 424-5388701</span>
-                        </div>
-                        <div class="flex items-center gap-6 p-6 bg-white rounded-3xl shadow-sm border border-slate-100">
-                            <i class="fa-solid fa-envelope text-2xl text-fbRed"></i>
-                            <span class="font-bold text-slate-700">proyectos@friobox.com</span>
+                        <div class="flex items-center gap-4 p-4 bg-white rounded-2xl shadow-sm border border-slate-100">
+                            <i class="fa-solid fa-envelope text-fbRed"></i>
+                            <span class="font-bold text-slate-700 text-xs">proyectos@friobox.com</span>
                         </div>
                     </div>
-                </div>
-                <div class="bg-fbBlue p-10 rounded-[3.5rem] shadow-3xl text-white">
-                    <form class="space-y-5">
-                        <input type="text" placeholder="Nombre Completo" class="w-full p-4 bg-white/10 rounded-xl focus:ring-2 focus:ring-fbRed focus:outline-none text-white border border-white/10">
-                        <input type="email" placeholder="Correo Electrónico" class="w-full p-4 bg-white/10 rounded-xl focus:ring-2 focus:ring-fbRed focus:outline-none text-white border border-white/10">
-                        <textarea rows="4" placeholder="Su Requerimiento" class="w-full p-4 bg-white/10 rounded-xl focus:ring-2 focus:ring-fbRed focus:outline-none text-white border border-white/10"></textarea>
-                        <button type="button" class="w-full bg-fbRed text-white py-5 rounded-2xl font-black uppercase italic tracking-widest hover:bg-white hover:text-fbRed transition-all">Enviar Mensaje</button>
-                    </form>
+                    <div class="bg-fbBlue p-6 rounded-[2rem] shadow-xl text-white">
+                        <form class="space-y-3">
+                            <input type="text" placeholder="Tu Nombre" class="w-full p-3 bg-white/10 rounded-xl text-xs border border-white/10">
+                            <textarea rows="2" placeholder="¿En qué podemos ayudar?" class="w-full p-3 bg-white/10 rounded-xl text-xs border border-white/10"></textarea>
+                            <button type="button" class="w-full bg-fbRed text-white py-3 rounded-xl font-black uppercase text-xs italic shadow-lg">Enviar Mensaje</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </section>
     </main>
 
     <!-- VISTA DE DETALLES -->
-    <div id="detail-view" class="hidden min-h-screen bg-fbLightGray pt-12 pb-24">
-        <div id="detail-content">
-            <!-- El contenido se inyecta aquí -->
-        </div>
+    <div id="detail-view" class="hidden min-h-screen bg-fbLightGray pb-24">
+        <div id="detail-content"></div>
     </div>
 
     <!-- FOOTER -->
-    <footer class="bg-fbDarkBlue text-white/30 py-12 text-center">
-        <div class="max-w-7xl mx-auto px-4">
-             <div class="flex justify-center mb-6">
-                <div class="w-12 h-12 bg-white/10 rounded-lg flex items-center justify-center text-white/50 italic font-black">FB</div>
-             </div>
-             <p class="text-xs uppercase tracking-widest font-black text-white/50">Corporación Frío Box, C.A. - RIF: J-40813955-4</p>
-             <p class="text-[10px] mt-4 leading-relaxed">© 2026 Todos los derechos reservados. <br> Ingeniería de Vanguardia en Barquisimeto.</p>
-        </div>
+    <footer class="bg-fbDarkBlue text-white/20 py-10 text-center mb-16 md:mb-0">
+         <p class="text-[9px] uppercase tracking-widest font-black">Corporación Frío Box, C.A. - RIF: J-40813955-4</p>
     </footer>
 
-    <!-- WHATSAPP -->
-    <a href="https://wa.me/584245388701" target="_blank" class="fixed bottom-6 right-6 w-16 h-16 bg-[#25D366] text-white rounded-full flex items-center justify-center text-3xl shadow-2xl z-[100] hover:scale-110 transition-transform">
-        <i class="fa-brands fa-whatsapp"></i>
-    </a>
+    <!-- BOT NAV (MOBILE ONLY) -->
+    <div id="bottom-nav" class="md:hidden fixed bottom-0 left-0 right-0 bg-fbBlue border-t-2 border-fbRed z-[100] px-4 py-2.5 flex justify-between items-center shadow-[0_-5px_20px_rgba(0,0,0,0.3)]">
+        <button onclick="navigate('home')" class="flex flex-col items-center gap-1 text-white hover:text-fbRed transition-colors">
+            <i class="fa-solid fa-house text-lg"></i>
+            <span class="text-[8px] font-black uppercase italic">Inicio</span>
+        </button>
+        <a href="#productos" onclick="navigate('home')" class="flex flex-col items-center gap-1 text-white hover:text-fbRed transition-colors">
+            <i class="fa-solid fa-boxes-stacked text-lg"></i>
+            <span class="text-[8px] font-black uppercase italic">Catálogo</span>
+        </a>
+        <div class="relative -mt-10">
+            <a href="https://wa.me/584245388701" target="_blank" class="w-14 h-14 bg-[#25D366] text-white rounded-full flex items-center justify-center text-2xl shadow-xl border-4 border-fbBlue">
+                <i class="fa-brands fa-whatsapp"></i>
+            </a>
+        </div>
+        <a href="#servicios" onclick="navigate('home')" class="flex flex-col items-center gap-1 text-white hover:text-fbRed transition-colors">
+            <i class="fa-solid fa-gear text-lg"></i>
+            <span class="text-[8px] font-black uppercase italic">Servicios</span>
+        </a>
+        <a href="#contacto" onclick="navigate('home')" class="flex flex-col items-center gap-1 text-white hover:text-fbRed transition-colors">
+            <i class="fa-solid fa-paper-plane text-lg"></i>
+            <span class="text-[8px] font-black uppercase italic">Contacto</span>
+        </a>
+    </div>
 
 </body>
 </html>
