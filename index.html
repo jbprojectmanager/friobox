@@ -21,35 +21,44 @@
             }
         }
 
-        // Navegación fluida tipo App
+        // Navegación condicional: Tipo App en móvil, Tradicional en PC
         function navigate(viewId) {
+            const isMobile = window.innerWidth < 768;
             const mainContent = document.getElementById('main-content');
             const detailView = document.getElementById('detail-view');
             const bottomNav = document.getElementById('bottom-nav');
             
-            if (viewId === 'home') {
-                mainContent.classList.remove('hidden');
-                detailView.classList.add('hidden');
-                if (bottomNav) bottomNav.classList.remove('hidden');
-                
-                const hash = window.location.hash;
-                if (hash) {
-                    setTimeout(() => {
-                        const el = document.querySelector(hash);
-                        if (el) el.scrollIntoView({ behavior: 'smooth' });
-                    }, 50);
+            // Solo usamos el sistema de "vistas" en móvil para simular App
+            if (isMobile) {
+                if (viewId === 'home') {
+                    mainContent.classList.remove('hidden');
+                    detailView.classList.add('hidden');
+                    if (bottomNav) bottomNav.classList.remove('hidden');
+                    window.scrollTo(0, 0);
                 } else {
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    mainContent.classList.add('hidden');
+                    detailView.classList.remove('hidden');
+                    if (bottomNav) bottomNav.classList.add('hidden');
+                    renderDetail(viewId);
+                    window.scrollTo(0, 0);
                 }
             } else {
-                mainContent.classList.add('hidden');
-                detailView.classList.remove('hidden');
-                renderDetail(viewId);
-                window.scrollTo(0, 0);
+                // En PC, si es home simplemente scrolleamos o mostramos el main
+                mainContent.classList.remove('hidden');
+                detailView.classList.add('hidden');
+                const element = document.getElementById(viewId);
+                if (element) {
+                    element.scrollIntoView({ behavior: 'smooth' });
+                } else if (contentData[viewId]) {
+                    // Si se hace clic en un producto en PC, mostramos el detalle pero sin ocultar la navegación
+                    detailView.classList.remove('hidden');
+                    mainContent.classList.add('hidden');
+                    renderDetail(viewId);
+                    window.scrollTo(0, 0);
+                }
             }
         }
 
-        // Datos EXACTOS del archivo original
         const contentData = {
             'cavas': {
                 title: 'Cavas Cuarto Industriales',
@@ -136,26 +145,29 @@
         function renderDetail(id) {
             const data = contentData[id];
             const html = `
-                <div class="max-w-4xl mx-auto px-4 py-6 animate-fade-in">
-                    <button onclick="navigate('home')" class="mb-4 flex items-center gap-2 text-fbBlue font-black uppercase italic text-sm">
-                        <i class="fa-solid fa-chevron-left"></i> Volver
+                <div class="max-w-6xl mx-auto px-4 py-8 animate-fade-in">
+                    <button onclick="navigate('home')" class="mb-6 flex items-center gap-2 text-fbBlue font-black uppercase italic text-sm group">
+                        <i class="fa-solid fa-arrow-left group-hover:-translate-x-1 transition-transform"></i> Volver al Inicio
                     </button>
-                    <div class="bg-white rounded-[2.5rem] overflow-hidden shadow-xl border border-slate-100">
-                        <div class="h-56 md:h-96 overflow-hidden">
+                    <div class="bg-white rounded-[2rem] md:rounded-[3rem] overflow-hidden shadow-2xl border border-slate-100 grid md:grid-cols-2">
+                        <div class="h-64 md:h-full overflow-hidden">
                             <img src="${data.img}" alt="${data.title}" class="w-full h-full object-cover" onerror="this.src='${data.fallback}'">
                         </div>
-                        <div class="p-6 md:p-10 space-y-4">
-                            <span class="inline-block bg-fbRed text-white px-3 py-1 font-black uppercase text-[10px] italic tracking-widest rounded-md">${data.subtitle}</span>
-                            <h2 class="text-3xl md:text-5xl font-black text-fbBlue uppercase italic leading-tight">${data.title}</h2>
-                            <p class="text-slate-600 leading-relaxed font-medium text-sm md:text-lg">${data.desc}</p>
-                            <div class="bg-fbBlue p-6 rounded-[1.5rem] text-white">
-                                <h4 class="font-black uppercase italic mb-4 text-xs border-b border-white/10 pb-2">Especificaciones Técnicas</h4>
+                        <div class="p-8 md:p-12 flex flex-col justify-center space-y-6">
+                            <div>
+                                <span class="inline-block bg-fbRed text-white px-3 py-1 font-black uppercase text-[10px] italic tracking-widest rounded-md mb-2">${data.subtitle}</span>
+                                <h2 class="text-3xl md:text-5xl font-black text-fbBlue uppercase italic leading-tight">${data.title}</h2>
+                            </div>
+                            <p class="text-slate-600 leading-relaxed font-medium text-sm md:text-lg italic">${data.desc}</p>
+                            <div class="bg-fbLightGray p-6 rounded-[1.5rem] border border-slate-200">
+                                <h4 class="font-black uppercase italic mb-4 text-xs text-fbBlue border-b border-fbBlue/10 pb-2">Especificaciones Técnicas</h4>
                                 <ul class="grid grid-cols-1 gap-3">
-                                    ${data.specs.map(s => `<li class="flex items-start gap-3 text-xs md:text-sm font-medium"><i class="fa-solid fa-check text-fbRed mt-1"></i> ${s}</li>`).join('')}
+                                    ${data.specs.map(s => `<li class="flex items-start gap-3 text-xs md:text-sm font-bold text-slate-700"><i class="fa-solid fa-circle-check text-fbRed mt-0.5"></i> ${s}</li>`).join('')}
                                 </ul>
                             </div>
-                            <div class="pt-4">
-                                <a href="https://wa.me/584245388701" class="block w-full text-center bg-fbRed text-white py-4 rounded-xl font-black uppercase italic shadow-lg active:scale-95 transition-transform">Consultar Precio</a>
+                            <div class="pt-4 flex flex-col md:flex-row gap-4">
+                                <a href="https://wa.me/584245388701" class="flex-1 text-center bg-fbRed text-white py-4 rounded-xl font-black uppercase italic shadow-lg hover:shadow-fbRed/20 hover:-translate-y-1 transition-all">Consultar Ahora</a>
+                                <button onclick="navigate('home')" class="flex-1 text-center border-2 border-fbBlue text-fbBlue py-4 rounded-xl font-black uppercase italic hover:bg-fbBlue hover:text-white transition-all">Ver otros productos</button>
                             </div>
                         </div>
                     </div>
@@ -181,263 +193,281 @@
     <style>
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
-        body { -webkit-tap-highlight-color: transparent; }
-        .mobile-safe-area { padding-bottom: 80px; }
-        @media (min-width: 768px) { .mobile-safe-area { padding-bottom: 0; } }
+        
+        /* Ajustes específicos para comportamiento APP en móvil */
+        @media (max-width: 767px) {
+            body { -webkit-tap-highlight-color: transparent; padding-bottom: 80px; }
+            .mobile-app-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+            .mobile-app-card { padding: 8px; border-radius: 20px; }
+            .mobile-app-img { border-radius: 16px; margin-bottom: 8px; }
+            .mobile-app-text { font-size: 11px; }
+        }
     </style>
 </head>
-<body class="bg-fbLightGray font-sans text-slate-900 mobile-safe-area">
+<body class="bg-fbLightGray font-sans text-slate-900 overflow-x-hidden">
 
-    <!-- DESKTOP NAV (Oculto en móvil) -->
+    <!-- DESKTOP NAV: Siempre visible en PC -->
     <nav class="bg-fbBlue shadow-xl sticky top-0 z-50 border-b-4 border-fbRed hidden md:block">
-        <div class="max-w-7xl mx-auto px-4 h-20 flex justify-between items-center">
+        <div class="max-w-7xl mx-auto px-6 h-24 flex justify-between items-center">
             <div class="flex items-center cursor-pointer" onclick="navigate('home')">
-                <div class="bg-white p-1 rounded-lg border border-fbRed w-12 h-12 flex items-center justify-center">
-                    <img src="img/logo.png" alt="FB" class="max-w-full object-contain" onerror="this.src='https://via.placeholder.com/80/FFFFFF/D31B22?text=FB'">
+                <div class="bg-white p-1 rounded-xl border-2 border-fbRed w-14 h-14 flex items-center justify-center shadow-lg">
+                    <img src="img/logo.png" alt="Corporación Frío Box" class="max-w-full object-contain" onerror="this.src='https://via.placeholder.com/80/FFFFFF/D31B22?text=FB'">
                 </div>
-                <div class="ml-3 text-white">
-                    <span class="block text-lg font-black leading-none uppercase italic">Corporación <span class="text-fbRed">Frío Box</span></span>
-                    <span class="text-[8px] tracking-[0.3em] font-bold uppercase">Ingeniería Térmica</span>
+                <div class="ml-4 text-white">
+                    <span class="block text-2xl font-black leading-none uppercase italic tracking-tighter">Corporación <span class="text-fbRed">Frío Box</span></span>
+                    <span class="text-[10px] tracking-[0.4em] font-bold uppercase text-white/60">Ingeniería Térmica Industrial</span>
                 </div>
             </div>
-            <div class="flex gap-8 items-center">
-                <button onclick="navigate('home')" class="text-white hover:text-fbRed font-bold uppercase text-xs tracking-widest transition-colors">Inicio</button>
-                <a href="#productos" onclick="navigate('home')" class="text-white hover:text-fbRed font-bold uppercase text-xs tracking-widest transition-colors">Productos</a>
-                <a href="#servicios" onclick="navigate('home')" class="text-white hover:text-fbRed font-bold uppercase text-xs tracking-widest transition-colors">Servicios</a>
-                <a href="#contacto" onclick="navigate('home')" class="bg-fbRed text-white px-5 py-2 rounded-xl font-black text-[10px] uppercase italic">Contacto</a>
+            <div class="flex gap-10 items-center">
+                <button onclick="navigate('home')" class="text-white hover:text-fbRed font-black uppercase text-xs tracking-widest transition-all">Inicio</button>
+                <a href="#productos" onclick="navigate('home')" class="text-white hover:text-fbRed font-black uppercase text-xs tracking-widest transition-all">Productos</a>
+                <a href="#servicios" onclick="navigate('home')" class="text-white hover:text-fbRed font-black uppercase text-xs tracking-widest transition-all">Servicios</a>
+                <a href="#contacto" onclick="navigate('home')" class="bg-fbRed text-white px-8 py-3 rounded-xl font-black text-xs uppercase italic shadow-lg hover:bg-white hover:text-fbRed transition-all">Contacto</a>
             </div>
         </div>
     </nav>
 
-    <!-- MOBILE HEADER -->
-    <div class="md:hidden sticky top-0 z-50 bg-fbBlue px-4 py-3 flex items-center justify-between border-b-2 border-fbRed shadow-lg">
-        <div class="flex items-center gap-2" onclick="navigate('home')">
-            <div class="bg-white w-9 h-9 rounded-lg p-1">
+    <!-- MOBILE HEADER: Solo en móvil -->
+    <header class="md:hidden sticky top-0 z-50 bg-fbBlue px-4 py-4 flex items-center justify-between border-b-2 border-fbRed shadow-xl">
+        <div class="flex items-center gap-3" onclick="navigate('home')">
+            <div class="bg-white w-10 h-10 rounded-lg p-1 shadow-inner">
                 <img src="img/logo.png" alt="FB" class="w-full h-full object-contain" onerror="this.src='https://via.placeholder.com/80/FFFFFF/D31B22?text=FB'">
             </div>
-            <span class="text-white font-black italic uppercase text-sm">FRÍO <span class="text-fbRed">BOX</span></span>
+            <span class="text-white font-black italic uppercase text-base tracking-tighter">FRÍO <span class="text-fbRed">BOX</span></span>
         </div>
-        <a href="https://wa.me/584245388701" target="_blank" class="bg-fbRed text-white px-4 py-1.5 rounded-lg text-[10px] font-black uppercase italic">Chat Directo</a>
-    </div>
+        <a href="https://wa.me/584245388701" target="_blank" class="bg-fbRed text-white px-5 py-2 rounded-xl text-[10px] font-black uppercase italic shadow-lg">Chat Técnico</a>
+    </header>
 
     <!-- MAIN CONTENT -->
     <main id="main-content">
-        <!-- HERO -->
-        <section id="inicio" class="relative pt-8 pb-12 md:pt-32 md:pb-40 px-4">
-            <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-10 items-center">
+        <!-- HERO: Visualización potente en PC, compacta en Móvil -->
+        <section id="inicio" class="relative pt-10 pb-16 md:pt-32 md:pb-40 px-6">
+            <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
                 <div class="text-center lg:text-left animate-fade-in">
-                    <span class="inline-block px-3 py-1 rounded-full bg-fbBlue/10 text-fbBlue text-[10px] font-black uppercase tracking-widest mb-4">Venezuela | Barquisimeto</span>
-                    <h1 class="text-4xl md:text-8xl font-black text-fbBlue leading-none mb-4 md:mb-8 tracking-tighter uppercase italic">
-                        Frío de <br><span class="text-fbRed">Alto Nivel</span>
+                    <span class="inline-block px-4 py-1 rounded-full bg-fbBlue/10 text-fbBlue text-[11px] font-black uppercase tracking-[0.2em] mb-6">Barquisimeto | Venezuela</span>
+                    <h1 class="text-5xl md:text-8xl font-black text-fbBlue leading-[0.9] mb-6 md:mb-10 tracking-tighter uppercase italic">
+                        Ingeniería <br><span class="text-fbRed">Térmica</span>
                     </h1>
-                    <p class="text-sm md:text-xl text-slate-600 mb-8 max-w-lg mx-auto lg:mx-0 font-medium">
-                        Infraestructura térmica industrial. Especialistas en cavas cuarto y sistemas de transporte aéreo.
+                    <p class="text-sm md:text-2xl text-slate-600 mb-10 max-w-xl mx-auto lg:mx-0 font-medium leading-relaxed">
+                        Diseño, fabricación e instalación de infraestructura para la cadena de frío industrial.
                     </p>
-                    <div class="flex flex-col sm:flex-row gap-3">
-                        <a href="#contacto" class="bg-fbBlue text-white px-8 py-4 rounded-xl font-black uppercase italic shadow-lg text-center text-xs">Solicitar Proyecto</a>
-                        <a href="#asistente" class="bg-white border-2 border-fbBlue text-fbBlue px-8 py-4 rounded-xl font-black uppercase italic text-center text-xs">Consultor IA</a>
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                        <a href="#productos" class="bg-fbBlue text-white px-10 py-5 rounded-2xl font-black uppercase italic shadow-2xl hover:bg-fbRed transition-all text-sm">Explorar Catálogo</a>
+                        <a href="#contacto" class="bg-white border-4 border-fbBlue text-fbBlue px-10 py-5 rounded-2xl font-black uppercase italic text-sm hover:bg-fbBlue hover:text-white transition-all">Presupuestos</a>
                     </div>
                 </div>
-                <div class="hidden md:block relative">
-                    <div class="bg-white p-3 rounded-[3rem] shadow-2xl border border-slate-100">
-                        <img src="img/hero.png" alt="Ingeniería" class="w-full h-[500px] object-cover rounded-[2.5rem]" onerror="this.src='https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=800'">
+                <!-- Imagen Hero oculta en móvil para priorizar contenido -->
+                <div class="hidden lg:block relative">
+                    <div class="bg-white p-4 rounded-[4rem] shadow-2xl border border-slate-100 rotate-2">
+                        <img src="img/hero.png" alt="Infraestructura Industrial" class="w-full h-[600px] object-cover rounded-[3.5rem]" onerror="this.src='https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=800'">
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- PRODUCTOS (2 Columnas en móvil) -->
-        <section id="productos" class="py-10 md:py-24 bg-white rounded-t-[2.5rem] shadow-2xl">
-            <div class="max-w-7xl mx-auto px-4">
-                <div class="mb-8 text-center md:text-left">
-                    <h2 class="text-3xl md:text-5xl font-black text-fbBlue uppercase italic">Productos</h2>
-                    <div class="h-1 w-12 bg-fbRed mt-2 mx-auto md:mx-0"></div>
+        <!-- PRODUCTOS: Adaptable -->
+        <section id="productos" class="py-16 md:py-32 bg-white rounded-t-[3rem] md:rounded-t-[6rem] shadow-2xl relative z-10">
+            <div class="max-w-7xl mx-auto px-6">
+                <div class="mb-12 md:mb-20 text-center md:text-left">
+                    <h2 class="text-4xl md:text-7xl font-black text-fbBlue uppercase italic tracking-tighter">Productos</h2>
+                    <div class="h-2 w-24 bg-fbRed mt-4 mx-auto md:mx-0 rounded-full"></div>
                 </div>
                 
-                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-8">
-                    <!-- Cards Compactas para App -->
-                    <div onclick="navigate('cavas')" class="bg-fbLightGray rounded-3xl p-2 md:p-4 border border-slate-100 group cursor-pointer active:bg-slate-200 transition-colors">
-                        <div class="aspect-square rounded-2xl overflow-hidden mb-3">
-                            <img src="img/cava.png" alt="Cavas" class="w-full h-full object-cover group-hover:scale-110 transition-transform" onerror="this.src='https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=500'">
+                <!-- Grid que cambia a 2 columnas en móvil (tipo App) y 4 en PC (Web) -->
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-12">
+                    <!-- Cavas -->
+                    <div onclick="navigate('cavas')" class="group bg-fbLightGray p-3 md:p-6 rounded-[2rem] md:rounded-[3rem] border border-slate-100 cursor-pointer hover:shadow-2xl transition-all hover:-translate-y-2">
+                        <div class="aspect-square rounded-[1.5rem] md:rounded-[2.5rem] overflow-hidden mb-4 md:mb-6 shadow-lg">
+                            <img src="img/cava.png" alt="Cavas Cuarto" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onerror="this.src='https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=500'">
                         </div>
-                        <h3 class="font-black text-fbBlue uppercase italic text-[11px] md:text-lg text-center leading-tight">Cavas Cuarto</h3>
+                        <h3 class="font-black text-fbBlue uppercase italic text-xs md:text-2xl text-center leading-tight group-hover:text-fbRed transition-colors">Cavas Cuarto</h3>
                     </div>
 
-                    <div onclick="navigate('tuneles')" class="bg-fbLightGray rounded-3xl p-2 md:p-4 border border-slate-100 group cursor-pointer active:bg-slate-200 transition-colors">
-                        <div class="aspect-square rounded-2xl overflow-hidden mb-3">
-                            <img src="img/tunel.png" alt="Túneles" class="w-full h-full object-cover group-hover:scale-110 transition-transform" onerror="this.src='https://images.unsplash.com/photo-1517059224940-d4af9eec41b7?q=80&w=500'">
+                    <!-- Túneles -->
+                    <div onclick="navigate('tuneles')" class="group bg-fbLightGray p-3 md:p-6 rounded-[2rem] md:rounded-[3rem] border border-slate-100 cursor-pointer hover:shadow-2xl transition-all hover:-translate-y-2">
+                        <div class="aspect-square rounded-[1.5rem] md:rounded-[2.5rem] overflow-hidden mb-4 md:mb-6 shadow-lg">
+                            <img src="img/tunel.png" alt="Túneles IQF" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onerror="this.src='https://images.unsplash.com/photo-1517059224940-d4af9eec41b7?q=80&w=500'">
                         </div>
-                        <h3 class="font-black text-fbBlue uppercase italic text-[11px] md:text-lg text-center leading-tight">Túneles IQF</h3>
+                        <h3 class="font-black text-fbBlue uppercase italic text-xs md:text-2xl text-center leading-tight group-hover:text-fbRed transition-colors">Túneles IQF</h3>
                     </div>
 
-                    <div onclick="navigate('rieles')" class="bg-fbLightGray rounded-3xl p-2 md:p-4 border border-slate-100 group cursor-pointer active:bg-slate-200 transition-colors">
-                        <div class="aspect-square rounded-2xl overflow-hidden mb-3">
-                            <img src="img/rieles.png" alt="Rieles" class="w-full h-full object-cover group-hover:scale-110 transition-transform" onerror="this.src='https://images.unsplash.com/photo-1590856029826-c7a73142bbf1?q=80&w=500'">
+                    <!-- Rielería -->
+                    <div onclick="navigate('rieles')" class="group bg-fbLightGray p-3 md:p-6 rounded-[2rem] md:rounded-[3rem] border border-slate-100 cursor-pointer hover:shadow-2xl transition-all hover:-translate-y-2">
+                        <div class="aspect-square rounded-[1.5rem] md:rounded-[2.5rem] overflow-hidden mb-4 md:mb-6 shadow-lg">
+                            <img src="img/rieles.png" alt="Rielería Aérea" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onerror="this.src='https://images.unsplash.com/photo-1590856029826-c7a73142bbf1?q=80&w=500'">
                         </div>
-                        <h3 class="font-black text-fbBlue uppercase italic text-[11px] md:text-lg text-center leading-tight">Rielería</h3>
+                        <h3 class="font-black text-fbBlue uppercase italic text-xs md:text-2xl text-center leading-tight group-hover:text-fbRed transition-colors">Rielería</h3>
                     </div>
 
-                    <div onclick="navigate('puertas')" class="bg-fbLightGray rounded-3xl p-2 md:p-4 border border-slate-100 group cursor-pointer active:bg-slate-200 transition-colors">
-                        <div class="aspect-square rounded-2xl overflow-hidden mb-3">
-                            <img src="img/puerta.png" alt="Puertas" class="w-full h-full object-cover group-hover:scale-110 transition-transform" onerror="this.src='https://images.unsplash.com/photo-1516937941344-00b4e0337589?q=80&w=500'">
+                    <!-- Puertas -->
+                    <div onclick="navigate('puertas')" class="group bg-fbLightGray p-3 md:p-6 rounded-[2rem] md:rounded-[3rem] border border-slate-100 cursor-pointer hover:shadow-2xl transition-all hover:-translate-y-2">
+                        <div class="aspect-square rounded-[1.5rem] md:rounded-[2.5rem] overflow-hidden mb-4 md:mb-6 shadow-lg">
+                            <img src="img/puerta.png" alt="Puertas Industriales" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onerror="this.src='https://images.unsplash.com/photo-1516937941344-00b4e0337589?q=80&w=500'">
                         </div>
-                        <h3 class="font-black text-fbBlue uppercase italic text-[11px] md:text-lg text-center leading-tight">Puertas</h3>
+                        <h3 class="font-black text-fbBlue uppercase italic text-xs md:text-2xl text-center leading-tight group-hover:text-fbRed transition-colors">Puertas</h3>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- SERVICIOS (Estilo Lista de App) -->
-        <section id="servicios" class="py-12 bg-fbBlue text-white">
-            <div class="max-w-7xl mx-auto px-4">
-                <h2 class="text-2xl md:text-5xl font-black uppercase italic mb-8 text-center md:text-left">Servicios</h2>
-                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
-                    <!-- Items de Lista App -->
-                    <div onclick="navigate('proyectos-bim')" class="flex items-center gap-4 p-4 bg-white/5 rounded-2xl border border-white/10 active:bg-fbRed transition-colors cursor-pointer group">
-                        <div class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center text-lg"><i class="fa-solid fa-cube"></i></div>
-                        <div class="flex-1">
-                            <h3 class="font-black italic uppercase text-xs md:text-base">Proyectos BIM</h3>
-                            <p class="text-[9px] text-white/50 uppercase font-bold">Modelado e Ingeniería</p>
-                        </div>
-                        <i class="fa-solid fa-chevron-right text-white/20"></i>
+        <!-- SERVICIOS: Rejilla Amplia en PC, Lista en Móvil -->
+        <section id="servicios" class="py-20 md:py-32 bg-fbBlue text-white">
+            <div class="max-w-7xl mx-auto px-6">
+                <div class="mb-12 md:mb-20">
+                    <h2 class="text-4xl md:text-7xl font-black uppercase italic tracking-tighter">Servicios</h2>
+                    <p class="text-white/50 font-bold uppercase tracking-widest text-xs md:text-sm mt-4">Soluciones Integrales de Ingeniería</p>
+                </div>
+
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
+                    <!-- Servicio Item -->
+                    <div onclick="navigate('proyectos-bim')" class="bg-white/5 hover:bg-fbRed p-6 md:p-10 rounded-[2rem] border border-white/10 transition-all cursor-pointer group">
+                        <div class="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform"><i class="fa-solid fa-cube"></i></div>
+                        <h3 class="text-xl md:text-3xl font-black italic uppercase mb-4 leading-none">Proyectos BIM</h3>
+                        <p class="text-sm md:text-base text-white/60 group-hover:text-white transition-colors">Ingeniería de vanguardia y modelado 3D de alta precisión.</p>
                     </div>
 
-                    <div onclick="navigate('instalacion')" class="flex items-center gap-4 p-4 bg-white/5 rounded-2xl border border-white/10 active:bg-fbRed transition-colors cursor-pointer group">
-                        <div class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center text-lg"><i class="fa-solid fa-screwdriver-wrench"></i></div>
-                        <div class="flex-1">
-                            <h3 class="font-black italic uppercase text-xs md:text-base">Instalación</h3>
-                            <p class="text-[9px] text-white/50 uppercase font-bold">Montaje Profesional</p>
-                        </div>
-                        <i class="fa-solid fa-chevron-right text-white/20"></i>
+                    <div onclick="navigate('instalacion')" class="bg-white/5 hover:bg-fbRed p-6 md:p-10 rounded-[2rem] border border-white/10 transition-all cursor-pointer group">
+                        <div class="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform"><i class="fa-solid fa-screwdriver-wrench"></i></div>
+                        <h3 class="text-xl md:text-3xl font-black italic uppercase mb-4 leading-none">Instalación</h3>
+                        <p class="text-sm md:text-base text-white/60 group-hover:text-white transition-colors">Montaje profesional de paneles y equipos frigoríficos.</p>
                     </div>
 
-                    <div onclick="navigate('obra-civil')" class="flex items-center gap-4 p-4 bg-white/5 rounded-2xl border border-white/10 active:bg-fbRed transition-colors cursor-pointer group">
-                        <div class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center text-lg"><i class="fa-solid fa-trowel-bricks"></i></div>
-                        <div class="flex-1">
-                            <h3 class="font-black italic uppercase text-xs md:text-base">Obra Civil</h3>
-                            <p class="text-[9px] text-white/50 uppercase font-bold">Losas e Infraestructura</p>
-                        </div>
-                        <i class="fa-solid fa-chevron-right text-white/20"></i>
+                    <div onclick="navigate('obra-civil')" class="bg-white/5 hover:bg-fbRed p-6 md:p-10 rounded-[2rem] border border-white/10 transition-all cursor-pointer group">
+                        <div class="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform"><i class="fa-solid fa-trowel-bricks"></i></div>
+                        <h3 class="text-xl md:text-3xl font-black italic uppercase mb-4 leading-none">Obra Civil</h3>
+                        <p class="text-sm md:text-base text-white/60 group-hover:text-white transition-colors">Construcción especializada de losas aisladas térmicamente.</p>
                     </div>
 
-                    <div onclick="navigate('enchaquetado')" class="flex items-center gap-4 p-4 bg-white/5 rounded-2xl border border-white/10 active:bg-fbRed transition-colors cursor-pointer group">
-                        <div class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center text-lg"><i class="fa-solid fa-shield-halved"></i></div>
-                        <div class="flex-1">
-                            <h3 class="font-black italic uppercase text-xs md:text-base">Enchaquetado</h3>
-                            <p class="text-[9px] text-white/50 uppercase font-bold">Aislamiento Térmico</p>
-                        </div>
-                        <i class="fa-solid fa-chevron-right text-white/20"></i>
+                    <div onclick="navigate('enchaquetado')" class="bg-white/5 hover:bg-fbRed p-6 md:p-10 rounded-[2rem] border border-white/10 transition-all cursor-pointer group">
+                        <div class="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform"><i class="fa-solid fa-shield-halved"></i></div>
+                        <h3 class="text-xl md:text-3xl font-black italic uppercase mb-4 leading-none">Enchaquetado</h3>
+                        <p class="text-sm md:text-base text-white/60 group-hover:text-white transition-colors">Aislamiento y protección de líneas de refrigeración.</p>
                     </div>
 
-                    <div onclick="navigate('soldadura')" class="flex items-center gap-4 p-4 bg-white/5 rounded-2xl border border-white/10 active:bg-fbRed transition-colors cursor-pointer group">
-                        <div class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center text-lg"><i class="fa-solid fa-fire"></i></div>
-                        <div class="flex-1">
-                            <h3 class="font-black italic uppercase text-xs md:text-base">Soldadura</h3>
-                            <p class="text-[9px] text-white/50 uppercase font-bold">Procesos Especializados</p>
-                        </div>
-                        <i class="fa-solid fa-chevron-right text-white/20"></i>
+                    <div onclick="navigate('soldadura')" class="bg-white/5 hover:bg-fbRed p-6 md:p-10 rounded-[2rem] border border-white/10 transition-all cursor-pointer group">
+                        <div class="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform"><i class="fa-solid fa-fire"></i></div>
+                        <h3 class="text-xl md:text-3xl font-black italic uppercase mb-4 leading-none">Soldadura</h3>
+                        <p class="text-sm md:text-base text-white/60 group-hover:text-white transition-colors">Procesos especializados para sistemas de alta presión.</p>
                     </div>
 
-                    <div onclick="navigate('mantenimiento')" class="flex items-center gap-4 p-4 bg-white/5 rounded-2xl border border-white/10 active:bg-fbRed transition-colors cursor-pointer group">
-                        <div class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center text-lg"><i class="fa-solid fa-snowflake"></i></div>
-                        <div class="flex-1">
-                            <h3 class="font-black italic uppercase text-xs md:text-base">Refrigeración</h3>
-                            <p class="text-[9px] text-white/50 uppercase font-bold">Planes Preventivos</p>
-                        </div>
-                        <i class="fa-solid fa-chevron-right text-white/20"></i>
+                    <div onclick="navigate('mantenimiento')" class="bg-white/5 hover:bg-fbRed p-6 md:p-10 rounded-[2rem] border border-white/10 transition-all cursor-pointer group">
+                        <div class="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform"><i class="fa-solid fa-snowflake"></i></div>
+                        <h3 class="text-xl md:text-3xl font-black italic uppercase mb-4 leading-none">Mantenimiento</h3>
+                        <p class="text-sm md:text-base text-white/60 group-hover:text-white transition-colors">Planes preventivos para asegurar la operatividad total.</p>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- ASISTENTE IA (Estilo Chat App) -->
-        <section id="asistente" class="py-12 px-4 bg-white">
-            <div class="max-w-xl mx-auto">
-                <div class="bg-fbDarkBlue rounded-[2rem] overflow-hidden shadow-2xl flex flex-col border border-fbRed/20">
-                    <div class="p-4 bg-fbBlue flex items-center gap-3">
-                        <div class="w-10 h-10 bg-fbRed rounded-lg flex items-center justify-center text-white text-xl"><i class="fa-solid fa-robot"></i></div>
-                        <div>
-                            <p class="text-[10px] text-white/50 font-black uppercase">Calculadora Frío Box</p>
-                            <p class="text-xs text-white font-bold italic uppercase">Asistente de Ingeniería</p>
-                        </div>
-                    </div>
-                    <div id="chat-box" class="h-64 overflow-y-auto p-4 space-y-4 bg-slate-50 text-[11px] md:text-sm">
-                        <div class="flex items-start gap-2">
-                            <div class="w-7 h-7 bg-fbBlue text-white rounded-lg flex items-center justify-center text-[9px] font-bold">FB</div>
-                            <div class="bg-white p-3 rounded-2xl rounded-tl-none shadow-sm border border-slate-100 font-medium">
-                                Indíqueme el **producto, toneladas y ubicación** para generar un cálculo técnico.
+        <!-- ASISTENTE IA: Tipo App Chat siempre -->
+        <section id="asistente" class="py-20 md:py-32 px-6 bg-fbLightGray">
+            <div class="max-w-4xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+                <div class="order-2 md:order-1">
+                    <div class="bg-fbDarkBlue rounded-[2.5rem] overflow-hidden shadow-2xl flex flex-col border-4 border-fbBlue">
+                        <div class="p-6 bg-fbBlue flex items-center gap-4">
+                            <div class="w-12 h-12 bg-fbRed rounded-xl flex items-center justify-center text-white text-2xl shadow-lg"><i class="fa-solid fa-robot"></i></div>
+                            <div>
+                                <p class="text-[10px] text-white/50 font-black uppercase tracking-widest">Cálculos Técnicos</p>
+                                <p class="text-base text-white font-black italic uppercase tracking-tighter">Asistente Frío Box</p>
                             </div>
                         </div>
+                        <div id="chat-box" class="h-80 overflow-y-auto p-6 space-y-4 bg-white/95 text-xs md:text-sm">
+                            <div class="flex items-start gap-3">
+                                <div class="w-8 h-8 bg-fbBlue text-white rounded-lg flex items-center justify-center text-[10px] font-bold">FB</div>
+                                <div class="bg-slate-100 p-4 rounded-2xl rounded-tl-none shadow-sm border border-slate-200 font-medium text-slate-800 italic">
+                                    ¡Hola! Soy tu asistente de ingeniería. ¿Qué capacidad de almacenamiento necesitas calcular hoy?
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-4 bg-fbDarkBlue flex gap-3">
+                            <input type="text" id="user-msg" placeholder="Ej: Cava para 10 Ton de queso..." class="flex-1 p-4 rounded-xl focus:outline-none text-xs font-bold shadow-inner">
+                            <button onclick="enviarConsulta()" class="bg-fbRed text-white px-6 rounded-xl active:scale-90 transition-transform shadow-lg"><i class="fa-solid fa-paper-plane"></i></button>
+                        </div>
                     </div>
-                    <div class="p-3 bg-fbDarkBlue flex gap-2">
-                        <input type="text" id="user-msg" placeholder="Ej: 20 Ton Pollo en Barinas" class="flex-1 p-3 rounded-xl focus:outline-none text-xs font-bold">
-                        <button onclick="enviarConsulta()" class="bg-fbRed text-white px-4 rounded-xl active:scale-90 transition-transform"><i class="fa-solid fa-paper-plane"></i></button>
-                    </div>
+                </div>
+                <div class="order-1 md:order-2 space-y-6">
+                    <h2 class="text-4xl md:text-6xl font-black text-fbBlue uppercase italic tracking-tighter leading-none">Ingeniería al <br><span class="text-fbRed">instante</span></h2>
+                    <p class="text-slate-600 font-medium md:text-lg italic">Nuestro asistente utiliza parámetros técnicos reales para darte una estimación rápida de lo que tu proyecto requiere.</p>
                 </div>
             </div>
         </section>
 
         <!-- CONTACTO -->
-        <section id="contacto" class="py-12 bg-fbLightGray border-t border-slate-200 px-4">
-            <div class="max-w-7xl mx-auto space-y-6">
-                <h2 class="text-3xl font-black text-fbBlue uppercase italic text-center">Contacto</h2>
-                <div class="grid md:grid-cols-2 gap-4 items-center">
-                    <div class="space-y-2">
-                        <div class="flex items-center gap-4 p-4 bg-white rounded-2xl shadow-sm border border-slate-100">
-                            <i class="fa-solid fa-phone text-fbRed"></i>
-                            <span class="font-bold text-slate-700 text-xs">+58 424-5388701</span>
+        <section id="contacto" class="py-20 md:py-32 bg-white px-6">
+            <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-16">
+                <div class="space-y-10">
+                    <h2 class="text-4xl md:text-7xl font-black text-fbBlue uppercase italic tracking-tighter leading-none">Hablemos de tu <br><span class="text-fbRed">Proyecto</span></h2>
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-6 p-6 bg-fbLightGray rounded-3xl border border-slate-100 shadow-sm group hover:border-fbRed transition-all">
+                            <div class="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-2xl text-fbRed shadow-lg group-hover:bg-fbRed group-hover:text-white transition-all"><i class="fa-solid fa-phone"></i></div>
+                            <div>
+                                <p class="text-[10px] font-black uppercase text-slate-400">Teléfono Directo</p>
+                                <p class="text-lg font-black text-fbBlue">+58 424-5388701</p>
+                            </div>
                         </div>
-                        <div class="flex items-center gap-4 p-4 bg-white rounded-2xl shadow-sm border border-slate-100">
-                            <i class="fa-solid fa-envelope text-fbRed"></i>
-                            <span class="font-bold text-slate-700 text-xs">proyectos@friobox.com</span>
+                        <div class="flex items-center gap-6 p-6 bg-fbLightGray rounded-3xl border border-slate-100 shadow-sm group hover:border-fbRed transition-all">
+                            <div class="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-2xl text-fbRed shadow-lg group-hover:bg-fbRed group-hover:text-white transition-all"><i class="fa-solid fa-location-dot"></i></div>
+                            <div>
+                                <p class="text-[10px] font-black uppercase text-slate-400">Sede Principal</p>
+                                <p class="text-lg font-black text-fbBlue">Barquisimeto, Edo. Lara</p>
+                            </div>
                         </div>
                     </div>
-                    <div class="bg-fbBlue p-6 rounded-[2rem] shadow-xl text-white">
-                        <form class="space-y-3">
-                            <input type="text" placeholder="Tu Nombre" class="w-full p-3 bg-white/10 rounded-xl text-xs border border-white/10">
-                            <textarea rows="2" placeholder="¿En qué podemos ayudar?" class="w-full p-3 bg-white/10 rounded-xl text-xs border border-white/10"></textarea>
-                            <button type="button" class="w-full bg-fbRed text-white py-3 rounded-xl font-black uppercase text-xs italic shadow-lg">Enviar Mensaje</button>
-                        </form>
-                    </div>
+                </div>
+                <div class="bg-fbBlue p-10 md:p-16 rounded-[3rem] md:rounded-[4rem] shadow-2xl text-white relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-fbRed/10 rounded-full -mr-16 -mt-16"></div>
+                    <form class="space-y-4 relative z-10">
+                        <input type="text" placeholder="Nombre completo" class="w-full p-5 bg-white/10 rounded-2xl text-sm border border-white/10 focus:bg-white/20 transition-all placeholder:text-white/40 font-bold uppercase italic">
+                        <input type="email" placeholder="Correo electrónico" class="w-full p-5 bg-white/10 rounded-2xl text-sm border border-white/10 focus:bg-white/20 transition-all placeholder:text-white/40 font-bold uppercase italic">
+                        <textarea rows="4" placeholder="Cuéntanos tu requerimiento técnico..." class="w-full p-5 bg-white/10 rounded-2xl text-sm border border-white/10 focus:bg-white/20 transition-all placeholder:text-white/40 font-bold uppercase italic"></textarea>
+                        <button type="button" class="w-full bg-fbRed text-white py-5 rounded-2xl font-black uppercase italic tracking-widest hover:bg-white hover:text-fbRed transition-all shadow-xl">Enviar Mensaje</button>
+                    </form>
                 </div>
             </div>
         </section>
     </main>
 
-    <!-- VISTA DE DETALLES -->
-    <div id="detail-view" class="hidden min-h-screen bg-fbLightGray pb-24">
+    <!-- VISTA DE DETALLES: Solo se usa cuando el JS oculta el Main (principalmente en móvil) -->
+    <div id="detail-view" class="hidden min-h-screen bg-fbLightGray pt-8 pb-32">
         <div id="detail-content"></div>
     </div>
 
-    <!-- FOOTER -->
-    <footer class="bg-fbDarkBlue text-white/20 py-10 text-center mb-16 md:mb-0">
-         <p class="text-[9px] uppercase tracking-widest font-black">Corporación Frío Box, C.A. - RIF: J-40813955-4</p>
+    <!-- FOOTER: Desktop -->
+    <footer class="bg-fbDarkBlue text-white/20 py-16 text-center border-t border-white/5">
+        <div class="max-w-7xl mx-auto px-6">
+             <div class="flex justify-center mb-8">
+                <div class="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center text-white/30 italic font-black text-2xl">FB</div>
+             </div>
+             <p class="text-xs md:text-sm uppercase tracking-[0.4em] font-black text-white/40 mb-2">Corporación Frío Box, C.A.</p>
+             <p class="text-[10px] md:text-xs font-bold text-white/20">RIF: J-40813955-4 | Barquisimeto - Venezuela</p>
+             <p class="text-[10px] mt-8 text-white/10 leading-relaxed max-w-md mx-auto">Esta plataforma es propiedad de Corporación Frío Box. Todos los derechos reservados © 2026. Ingeniería de excelencia en refrigeración industrial.</p>
+        </div>
     </footer>
 
-    <!-- BOT NAV (MOBILE ONLY) -->
-    <div id="bottom-nav" class="md:hidden fixed bottom-0 left-0 right-0 bg-fbBlue border-t-2 border-fbRed z-[100] px-4 py-2.5 flex justify-between items-center shadow-[0_-5px_20px_rgba(0,0,0,0.3)]">
-        <button onclick="navigate('home')" class="flex flex-col items-center gap-1 text-white hover:text-fbRed transition-colors">
-            <i class="fa-solid fa-house text-lg"></i>
-            <span class="text-[8px] font-black uppercase italic">Inicio</span>
+    <!-- BOTTOM TAB BAR: ÚNICAMENTE EN MÓVIL (Comportamiento App) -->
+    <nav id="bottom-nav" class="md:hidden fixed bottom-0 left-0 right-0 bg-fbBlue border-t-2 border-fbRed z-[100] px-6 py-4 flex justify-between items-center shadow-[0_-8px_30px_rgba(0,0,0,0.5)]">
+        <button onclick="navigate('home')" class="flex flex-col items-center gap-1.5 text-white hover:text-fbRed transition-colors">
+            <i class="fa-solid fa-house-chimney text-xl"></i>
+            <span class="text-[9px] font-black uppercase italic tracking-tighter">Inicio</span>
         </button>
-        <a href="#productos" onclick="navigate('home')" class="flex flex-col items-center gap-1 text-white hover:text-fbRed transition-colors">
-            <i class="fa-solid fa-boxes-stacked text-lg"></i>
-            <span class="text-[8px] font-black uppercase italic">Catálogo</span>
+        <a href="#productos" onclick="navigate('home')" class="flex flex-col items-center gap-1.5 text-white hover:text-fbRed transition-colors">
+            <i class="fa-solid fa-layer-group text-xl"></i>
+            <span class="text-[9px] font-black uppercase italic tracking-tighter">Catálogo</span>
         </a>
-        <div class="relative -mt-10">
-            <a href="https://wa.me/584245388701" target="_blank" class="w-14 h-14 bg-[#25D366] text-white rounded-full flex items-center justify-center text-2xl shadow-xl border-4 border-fbBlue">
+        <div class="relative -mt-12">
+            <a href="https://wa.me/584245388701" target="_blank" class="w-16 h-16 bg-[#25D366] text-white rounded-full flex items-center justify-center text-3xl shadow-2xl border-4 border-fbBlue active:scale-90 transition-transform">
                 <i class="fa-brands fa-whatsapp"></i>
             </a>
         </div>
-        <a href="#servicios" onclick="navigate('home')" class="flex flex-col items-center gap-1 text-white hover:text-fbRed transition-colors">
-            <i class="fa-solid fa-gear text-lg"></i>
-            <span class="text-[8px] font-black uppercase italic">Servicios</span>
+        <a href="#servicios" onclick="navigate('home')" class="flex flex-col items-center gap-1.5 text-white hover:text-fbRed transition-colors">
+            <i class="fa-solid fa-toolbox text-xl"></i>
+            <span class="text-[9px] font-black uppercase italic tracking-tighter">Servicios</span>
         </a>
-        <a href="#contacto" onclick="navigate('home')" class="flex flex-col items-center gap-1 text-white hover:text-fbRed transition-colors">
-            <i class="fa-solid fa-paper-plane text-lg"></i>
-            <span class="text-[8px] font-black uppercase italic">Contacto</span>
+        <a href="#contacto" onclick="navigate('home')" class="flex flex-col items-center gap-1.5 text-white hover:text-fbRed transition-colors">
+            <i class="fa-solid fa-paper-plane text-xl"></i>
+            <span class="text-[9px] font-black uppercase italic tracking-tighter">Contacto</span>
         </a>
-    </div>
+    </nav>
 
 </body>
 </html>
